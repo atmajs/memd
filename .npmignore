@@ -17,3 +17,5 @@ src/
 builds/
 examples/
 ts-temp/
+tsconfig*
+typings.json
