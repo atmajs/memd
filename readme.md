@@ -3,10 +3,9 @@
 
 [![Build Status](https://travis-ci.org/atmajs/Ruta.png?branch=master)](https://travis-ci.org/tenbits/memd)
 [![NPM version](https://badge.fury.io/js/memd.svg)](http://badge.fury.io/js/memd)
-[![Bower version](https://badge.fury.io/bo/memd.svg)](http://badge.fury.io/bo/memd)
 
-
-Object Cache. Memoize, debounce, throttle and queue methods.
+* Memoize, debounce, throttle and queue methods
+* Object Cache
 
 ```typescript
 
@@ -52,5 +51,34 @@ const cache = new Cache(<ICacheOpts> { maxAge: 60 });
 
 ```
 
+### `memoize`
+
+```ts
+.memoize(opts?: ICacheOpts)
+```
+
+### `debounce`
+
+When `ms` is `0` or `undefined` then `requestAnimationFrame` or `setImmediate` is used. 
+
+```ts
+.memoize(ms: number = 0)
+```
+
+### `throttle`
+
+```ts
+.throttle(ms: number, shouldCallLater?: boolean)
+```
+
+### `queued`
+
+Calls method only when the previous promise is resolved. Use `trimQueue: true` to ensure the queue consists of max 1 listener.
+
+```ts
+async .queued(opts: { trimQueue?: boolean })
+```
+
 ----
 _Atma.js Project_
+

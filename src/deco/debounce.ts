@@ -1,3 +1,5 @@
+const requestFn: any = typeof requestAnimationFrame === 'undefined' ? setImmediate : requestAnimationFrame;
+const clearRequest: any = typeof requestAnimationFrame === 'undefined' ? clearImmediate : cancelAnimationFrame;
 /**
  * 
  * @param timeout ms to wait before calling inner fn
@@ -17,9 +19,9 @@ export function deco_debounce (timeout?: number) {
             descriptor.value =  function (...args) {
                 const self = this;
                 if (frame !== 0) {
-                    cancelAnimationFrame(frame);
+                    clearRequest(frame);
                 }
-                frame = requestAnimationFrame(function() {
+                frame = requestFn(function() {
                     frame = 0;
                     fn.apply(self, args);
                 });
