@@ -25,7 +25,8 @@ declare module 'memd' {
 
 declare module 'memd/deco/memoize' {
     import { ICacheOpts } from 'memd/Cache';
-    export function deco_memoize(opts?: ICacheOpts): (target: any, propertyKey: any, descriptor?: any) => any;
+    import { IMemoizeOpts } from 'memd/fn/memoize';
+    export function deco_memoize(opts?: ICacheOpts & IMemoizeOpts): (target: any, propertyKey: any, descriptor?: any) => any;
 }
 
 declare module 'memd/deco/debounce' {
@@ -54,7 +55,10 @@ declare module 'memd/deco/queued' {
 declare module 'memd/fn/memoize' {
     import { IMemoizeWrapper } from 'memd/model/IMemoizeWrapper';
     import { ICacheOpts } from 'memd/Cache';
-    export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts): IMemoizeWrapper<T>;
+    export interface IMemoizeOpts {
+        perInstance?: boolean;
+    }
+    export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper<T>;
 }
 
 declare module 'memd/Cache' {

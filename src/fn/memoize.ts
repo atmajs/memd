@@ -1,19 +1,41 @@
 import { IMemoizeWrapper } from '../model/IMemoizeWrapper';
 import { Cache, ICacheOpts } from '../Cache'
 
-export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts = {}): IMemoizeWrapper<T> {
+export interface IMemoizeOpts {
+    perInstance?: boolean
+}
+
+export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper<T> {
+    let _perInstance = opts?.perInstance ?? false;
     let _cache = new Cache(opts);
+    let _caches = [] as Cache[];
+
     const Wrapper: IMemoizeWrapper<T> = function (...args) {
-        const id = _cache.resolveKey(...args);
+        let cache = _cache;
+        if (_perInstance === true) {
+            let prop = `__$mem_${key}`;
+            cache = this[prop];
+            if (cache == null) {
+                cache = new Cache(opts);
+                Object.defineProperty(this, prop, {
+                    value: cache,
+                    enumerable: false
+                });
+                _caches.push(cache);
+            }
+        }
+        const id = cache.resolveKey(...args);
         
-        return _cache.get(id) ?? (_cache.set(id, fn.apply(this, args)));
+        return cache.get(id) ?? (cache.set(id, fn.apply(this, args)));
     };
     Wrapper.clearArgs = function (...args) {
         const id = _cache.resolveKey(...args);
         _cache.clear(id);
+        _caches.forEach(x => x.clear(id));
     };
     Wrapper.clearAll = function () {
         _cache.clear();
+        _caches.forEach(x => x.clear());
     };
     return Wrapper;
 };
