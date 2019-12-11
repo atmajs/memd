@@ -48,7 +48,7 @@ declare module 'memd/deco/throttle' {
 
 declare module 'memd/deco/queued' {
     export function deco_queued(opts?: {
-        trimQueue: boolean;
+        trimQueue?: boolean;
     }): (target: any, propertyKey: any, descriptor?: any) => any;
 }
 

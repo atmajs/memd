@@ -1,13 +1,13 @@
 import { Deferred } from '../model/Deferred';
 
-export function deco_queued (opts: { trimQueue: boolean } = null) {
+export function deco_queued (opts: { trimQueue?: boolean, } = null) {
     return function (target, propertyKey, descriptor?) {
         let viaProperty = descriptor == null;
         let fn = viaProperty ? target[propertyKey] : descriptor.value;
         let queue = [];
         let busy = false;
-        let resultFn = function () {
-            let wrapped = Queued.prepair(fn, this);
+        let resultFn = function (...args) {
+            let wrapped = Queued.prepair(fn, this, args);
             if (opts != null && opts.trimQueue && queue.length > 0) {
                 queue.splice(0);
             }
@@ -25,7 +25,7 @@ export function deco_queued (opts: { trimQueue: boolean } = null) {
                 return;
             }
             x.always(tick);
-            x.run.apply(this, arguments);
+            x.run();
         };
 
         if (viaProperty) {
@@ -39,12 +39,12 @@ export function deco_queued (opts: { trimQueue: boolean } = null) {
 
 
 const Queued = {
-    prepair(innerFn, ctx) {
+    prepair(innerFn: Function, ctx, args: any[]) {
         let dfr = new Deferred;
         return {
             promise: dfr,
             run() {
-                let result = innerFn.apply(ctx, arguments);
+                let result = innerFn.apply(ctx, args);
                 if ('then' in result === false) {
                     dfr.resolve(result);
                 } else {

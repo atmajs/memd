@@ -54,7 +54,7 @@ const cache = new Cache(<ICacheOpts> { maxAge: 60 });
 ### `memoize`
 
 ```ts
-.memoize(opts?: ICacheOpts)
+.memoize(opts?: ICacheOpts & { perInstance: boolean })
 ```
 
 ### `debounce`
