@@ -1,5 +1,4 @@
-export interface IMemoizeWrapper<T extends Function> {
-    (fn: T): T
+export interface IMemoizeWrapper {
     clearArgs(...args)
     clearAll()
 }

@@ -6,13 +6,13 @@ export interface IMemoizeOpts {
     clearOnReject?: boolean
 }
 
-export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper<T> {
+export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper & T {
     let _perInstance = opts?.perInstance ?? false;
     let _clearOnReject = opts?.clearOnReject ?? false;
     let _cache = new Cache(opts);
     let _caches = [] as Cache[];
 
-    const Wrapper: IMemoizeWrapper<T> = function (...args) {
+    const Wrapper: IMemoizeWrapper & T = <any> function (...args) {
         let cache = _cache;
         if (_perInstance === true) {
             let prop = `__$mem_${key}`;

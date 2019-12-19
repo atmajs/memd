@@ -59,7 +59,7 @@ declare module 'memd/fn/memoize' {
         perInstance?: boolean;
         clearOnReject?: boolean;
     }
-    export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper<T>;
+    export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper & T;
 }
 
 declare module 'memd/Cache' {
@@ -88,8 +88,7 @@ declare module 'memd/Cache' {
 }
 
 declare module 'memd/model/IMemoizeWrapper' {
-    export interface IMemoizeWrapper<T extends Function> {
-        (fn: T): T;
+    export interface IMemoizeWrapper {
         clearArgs(...args: any[]): any;
         clearAll(): any;
     }
