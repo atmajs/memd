@@ -57,6 +57,7 @@ declare module 'memd/fn/memoize' {
     import { ICacheOpts } from 'memd/Cache';
     export interface IMemoizeOpts {
         perInstance?: boolean;
+        clearOnReject?: boolean;
     }
     export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper<T>;
 }
