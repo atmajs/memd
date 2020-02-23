@@ -5,7 +5,7 @@
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.2.73",
+    "version": "0.2.74",
     "main": "./lib/memd.js",
     "types": "./lib/memd.d.ts",
     "repository": {
@@ -15,7 +15,7 @@
     "devDependencies": {
         "@types/node": "^12.12.6",
         "@types/sinon": "^2.3.3",
-        "app-bundler": "0.0.75",
+        "app-bundler": "0.0.83",
         "atma": "^0.12.9",
         "atma-loader-ts": "^1.1.11",
         "atma-utils": "^0.1.31",
