@@ -7,6 +7,9 @@ declare module 'memd' {
     import { deco_queued } from 'memd/deco/queued';
     import { fn_memoize } from 'memd/fn/memoize';
     import { Cache } from 'memd/Cache';
+    import { FsTransport } from 'memd/persistance/FsTransport';
+    import { LocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
+    import { CachedWorker } from 'memd/workers/CachedWorker';
     class Memd {
         static Cache: typeof Cache;
         static fn: {
@@ -18,6 +21,9 @@ declare module 'memd' {
             debounce: typeof deco_debounce;
             queued: typeof deco_queued;
         };
+        static FsTransport: typeof FsTransport;
+        static LocalStorageTransport: typeof LocalStorageTransport;
+        static CachedWorker: typeof CachedWorker;
         static default: typeof Memd;
     }
     export = Memd;
@@ -86,10 +92,58 @@ declare module 'memd/Cache' {
         constructor(options?: ICacheOpts);
         resolveKey(...args: any[]): string;
         get(key: string): T;
+        getAsync(key: string): Promise<T>;
         set(key: string, val: T): T;
         setCollection(coll: ICacheEntryCollection): void;
         clear(key?: string): void;
         destroy(): void;
+    }
+}
+
+declare module 'memd/persistance/FsTransport' {
+    import { ITransport } from 'memd/persistance/Transport';
+    import { ICacheEntryCollection } from 'memd/Cache';
+    export interface IFsTransport {
+        path: string;
+    }
+    export class FsTransport implements ITransport {
+        opts: IFsTransport;
+        isAsync: boolean;
+        constructor(opts: IFsTransport);
+        restoreAsync(): any;
+        flushAsync(coll: ICacheEntryCollection): void;
+    }
+}
+
+declare module 'memd/persistance/LocalStorageTransport' {
+    import { ITransport } from 'memd/persistance/Transport';
+    import { ICacheEntryCollection } from 'memd/Cache';
+    export interface ILocalStorageTransport {
+        key: string;
+    }
+    export class LocalStorageTransport implements ITransport {
+        opts: ILocalStorageTransport;
+        isAsync: boolean;
+        constructor(opts: ILocalStorageTransport);
+        restore(): any;
+        flush(coll: ICacheEntryCollection): void;
+    }
+}
+
+declare module 'memd/workers/CachedWorker' {
+    import { IFsTransport } from 'memd/persistance/FsTransport';
+    import { ILocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
+    import { ICacheOpts } from 'memd/Cache';
+    export interface ICachedWorkerOptions<T> {
+        transport: IFsTransport | ILocalStorageTransport;
+        worker: () => T;
+    }
+    export class CachedWorker<T> {
+        constructor(opts: ICachedWorkerOptions<T> & ICacheOpts);
+        run<T>(): T;
+        runAsync<T>(): Promise<T>;
+        static run<T>(opts: ICachedWorkerOptions<T>): T;
+        static runAsync<T>(opts: ICachedWorkerOptions<T>): Promise<T>;
     }
 }
 

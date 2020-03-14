@@ -4,6 +4,9 @@ import { deco_throttle } from './deco/throttle';
 import { deco_queued } from './deco/queued';
 import { fn_memoize } from './fn/memoize';
 import { Cache } from './Cache'
+import { FsTransport } from './persistance/FsTransport';
+import { LocalStorageTransport } from './persistance/LocalStorageTransport';
+import { CachedWorker } from './workers/CachedWorker';
 
 class Memd {
 
@@ -17,6 +20,10 @@ class Memd {
         debounce: deco_debounce,
         queued: deco_queued
     }
+    static FsTransport = FsTransport
+    static LocalStorageTransport = LocalStorageTransport
+    static CachedWorker = CachedWorker
+
     static default: typeof Memd
 }
 

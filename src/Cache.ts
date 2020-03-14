@@ -54,6 +54,12 @@ export class Cache <T = any> {
         }
         return entry.value;
     }
+    async getAsync (key: string): Promise<T> {
+        if (this._transport != null && this._transport.isReady === false) {
+            await this._transport.restoreAsync();
+        }
+        return this.get(key);
+    }
     set (key: string, val: T): T {
         this._cache[key] = {
             timestamp: Date.now(),
