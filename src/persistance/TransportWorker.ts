@@ -25,7 +25,7 @@ export class TransportWorker {
     }
 
     async restoreAsync () {
-        return this.restorePromise ?? (this.restorePromise = new Promise(async resolve => {
+        return this.restorePromise ?? (this.restorePromise = (async () => {
             if (this.isReady) {
                 return;
             }
@@ -39,7 +39,7 @@ export class TransportWorker {
             }
             this.cache.setCollection(coll);
             this.isReady = true;
-        }));
+        })());
     }
 
     flush (coll: ICacheEntryCollection) {

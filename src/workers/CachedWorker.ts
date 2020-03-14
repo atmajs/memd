@@ -12,7 +12,7 @@ export interface ICachedWorkerOptions <T> {
 export class CachedWorker <T> {
     
     private cache: Cache
-    private worker: () => T | Promise<T>
+    private worker: () => (T | Promise<T>)
     private workerDfr: Promise<any>;
 
     constructor (private opts: ICachedWorkerOptions<T> & ICacheOpts) {
@@ -53,7 +53,9 @@ export class CachedWorker <T> {
             if (result) {
                 return result;
             }
-            result = await this.opts.worker()
+            result = await this.opts.worker();
+            this.cache.set('result', result);
+            return result;
         })());
     }
 

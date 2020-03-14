@@ -21,7 +21,7 @@ export class FsTransport implements ITransport {
 
     async restoreAsync () {
         if (await this.File.existsAsync(this.opts.path) === false) {
-            return null;
+            return {};
         }
         return this.File.readAsync(this.opts.path);
     }
