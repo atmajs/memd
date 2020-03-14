@@ -48,18 +48,19 @@ export class CachedWorker <T> {
         return result;
     }
     async runAsync <T> (): Promise <T> {
-        return this.workerDfr ?? (this.workerDfr = new Promise(async resolve => {
+        return this.workerDfr ?? (this.workerDfr = (async () => {
             let result = await this.cache.getAsync('result');
             if (result) {
                 return result;
             }
-        }));
+            result = await this.opts.worker()
+        })());
     }
 
-    static run <T> (opts: ICachedWorkerOptions<T>): T {
+    static run <T> (opts: ICachedWorkerOptions<T> & ICacheOpts): T {
         return new CachedWorker(opts).run();
     }
-    static runAsync <T> (opts: ICachedWorkerOptions<T>): Promise <T> {
+    static runAsync <T> (opts: ICachedWorkerOptions<T> & ICacheOpts): Promise <T> {
         return new CachedWorker(opts).runAsync();
     }
 }

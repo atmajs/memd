@@ -142,8 +142,8 @@ declare module 'memd/workers/CachedWorker' {
         constructor(opts: ICachedWorkerOptions<T> & ICacheOpts);
         run<T>(): T;
         runAsync<T>(): Promise<T>;
-        static run<T>(opts: ICachedWorkerOptions<T>): T;
-        static runAsync<T>(opts: ICachedWorkerOptions<T>): Promise<T>;
+        static run<T>(opts: ICachedWorkerOptions<T> & ICacheOpts): T;
+        static runAsync<T>(opts: ICachedWorkerOptions<T> & ICacheOpts): Promise<T>;
     }
 }
 
