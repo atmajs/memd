@@ -110,7 +110,7 @@ declare module 'memd/persistance/FsTransport' {
         opts: IFsTransport;
         isAsync: boolean;
         constructor(opts: IFsTransport);
-        restoreAsync(): any;
+        restoreAsync(): Promise<any>;
         flushAsync(coll: ICacheEntryCollection): void;
     }
 }

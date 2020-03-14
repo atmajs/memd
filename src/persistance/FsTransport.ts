@@ -16,10 +16,13 @@ export class FsTransport implements ITransport {
         }
         const r = require;
         const module = 'atma-io';
-        File = r(module);
+        this.File = r(module).File;
     }
 
-    restoreAsync () {
+    async restoreAsync () {
+        if (await this.File.existsAsync(this.opts.path) === false) {
+            return null;
+        }
         return this.File.readAsync(this.opts.path);
     }
     flushAsync (coll: ICacheEntryCollection) {
