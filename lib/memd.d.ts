@@ -32,9 +32,9 @@ declare module 'memd/deco/memoize' {
 declare module 'memd/deco/debounce' {
     /**
       *
-      * @param timeout ms to wait before calling inner fn
+      * @param timeoutMs ms to wait before calling inner fn
       */
-    export function deco_debounce(timeout?: number): (target: any, propertyKey: any, descriptor?: any) => any;
+    export function deco_debounce(timeoutMs?: number): (target: any, propertyKey: any, descriptor?: any) => any;
 }
 
 declare module 'memd/deco/throttle' {
@@ -63,10 +63,12 @@ declare module 'memd/fn/memoize' {
 }
 
 declare module 'memd/Cache' {
+    import { ITransport } from 'memd/persistance/Transport';
     export interface ICacheOpts {
         maxAge?: number;
         monitors?: ICacheChangeEventMonitor[];
         keyResolver?: (...args: any[]) => string;
+        persistance?: ITransport;
     }
     export interface ICacheChangeEventMonitor {
         on(event: 'change', fn: Function): any;
@@ -76,12 +78,16 @@ declare module 'memd/Cache' {
         timestamp: number;
         value: T;
     }
+    export interface ICacheEntryCollection<T = any> {
+        [key: string]: ICacheEntry<T>;
+    }
     export class Cache<T = any> {
         options: ICacheOpts;
         constructor(options?: ICacheOpts);
         resolveKey(...args: any[]): string;
         get(key: string): T;
         set(key: string, val: T): T;
+        setCollection(coll: ICacheEntryCollection): void;
         clear(key?: string): void;
         destroy(): void;
     }
@@ -91,6 +97,18 @@ declare module 'memd/model/IMemoizeWrapper' {
     export interface IMemoizeWrapper {
         clearArgs(...args: any[]): any;
         clearAll(): any;
+    }
+}
+
+declare module 'memd/persistance/Transport' {
+    import { ICacheEntryCollection } from 'memd/Cache';
+    export interface ITransport<T = any> {
+        isAsync: boolean;
+        debounceMs?: number;
+        restore?(): ICacheEntryCollection<T>;
+        restoreAsync?(): Promise<ICacheEntryCollection<T>>;
+        flush?(data: ICacheEntryCollection<T>): any;
+        flushAsync?(data: ICacheEntryCollection<T>): any;
     }
 }
 

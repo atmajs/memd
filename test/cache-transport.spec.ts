@@ -33,6 +33,11 @@ UTest({
         });
         let val = cache.get('foo');
         eq_(val, 'baz');
+
+        '> should clear cache and persistance'
+        cache.clear();
+        let val2 = cache.get('foo');
+        eq_(val2, null);
     },
     'should skip outdated' () {
         let ageMs = 30 * 24 * 60 * 60 * 1000;
