@@ -2,9 +2,9 @@ const requestFn: any = typeof requestAnimationFrame === 'undefined' ? setImmedia
 const clearRequest: any = typeof requestAnimationFrame === 'undefined' ? clearImmediate : cancelAnimationFrame;
 /**
  * 
- * @param timeout ms to wait before calling inner fn
+ * @param timeoutMs ms to wait before calling inner fn
  */
-export function deco_debounce (timeout?: number) {
+export function deco_debounce (timeoutMs?: number) {
     return function(target, propertyKey, descriptor?) {
         let viaProperty = descriptor == null;
         if (viaProperty) {
@@ -14,7 +14,7 @@ export function deco_debounce (timeout?: number) {
             };
         }
         let fn = descriptor.value;
-        if (timeout == null || timeout === 0) {
+        if (timeoutMs == null || timeoutMs === 0) {
             let frame = 0;
             descriptor.value =  function (...args) {
                 const self = this;
@@ -33,7 +33,7 @@ export function deco_debounce (timeout?: number) {
                 clearTimeout(timer);
                 timer = <any> setTimeout(function() {
                     fn.apply(self, args);
-                }, timeout);
+                }, timeoutMs);
             };
         }
         if (viaProperty) {

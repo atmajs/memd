@@ -1,9 +1,12 @@
 import { Args } from './fn/Args';
+import { ITransport } from './persistance/Transport';
+import { TransportWorker } from './persistance/TransportWorker';
 
 export interface ICacheOpts {
     maxAge?: number
     monitors?: ICacheChangeEventMonitor[]
     keyResolver?: (...args) => string
+    persistance?: ITransport
 }
 export interface ICacheChangeEventMonitor {
     on (event: 'change', fn: Function)
@@ -14,14 +17,21 @@ export interface ICacheEntry <T = any> {
     timestamp: number
     value: T
 }
+export interface ICacheEntryCollection<T = any> {
+    [key: string]: ICacheEntry<T>
+}
 
 export class Cache <T = any> {
-    private _cache: { [key: string]: ICacheEntry<T> } = {};
+    private _cache: ICacheEntryCollection<T> = {};
+    private _transport: TransportWorker;
 
     constructor (public options: ICacheOpts = {}) {
         if (this.options.monitors) {
             this.onChanged = this.onChanged.bind(this);
             options.monitors.forEach(x => x.on('change', this.onChanged));
+        }
+        if (this.options.persistance) {
+            this._transport = new TransportWorker(this, this.options.persistance);
         }
     }
 
@@ -31,6 +41,9 @@ export class Cache <T = any> {
     }
 
     get (key: string): T {
+        if (this._transport != null && this._transport.isReady === false) {
+            this._transport.restore();
+        }
         let entry = this._cache[key];
         if (entry == null) {
             return null;
@@ -46,15 +59,22 @@ export class Cache <T = any> {
             timestamp: Date.now(),
             value: val
         };
+        
+        this._transport?.flush(this._cache);
         return val;
+    }
+    setCollection (coll: ICacheEntryCollection) {
+        this._cache = coll ?? {};
     }
 
     clear (key?: string) {
         if (typeof key === 'string') {
             this._cache[key] = null;
+            this._transport?.flush(this._cache);
             return;
         }
         this._cache = {};
+        this._transport?.flush(this._cache);
     }
 
     destroy () {
