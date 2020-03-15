@@ -136,7 +136,7 @@ declare module 'memd/workers/CachedWorker' {
     import { ICacheOpts } from 'memd/Cache';
     export interface ICachedWorkerOptions<T> {
         transport: IFsTransportOpts | ILocalStorageTransport;
-        worker: () => T;
+        worker: () => (T | Promise<T>);
     }
     export class CachedWorker<T> {
         constructor(opts: ICachedWorkerOptions<T> & ICacheOpts);

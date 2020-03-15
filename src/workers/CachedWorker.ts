@@ -6,7 +6,7 @@ import { ICacheOpts } from '../Cache';
 
 export interface ICachedWorkerOptions <T> {
     transport: IFsTransportOpts | ILocalStorageTransport
-    worker: () => T
+    worker: () => (T | Promise<T>)
 }
 
 export class CachedWorker <T> {
