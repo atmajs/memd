@@ -1,11 +1,11 @@
-import { IFsTransport, FsTransport } from '../persistance/FsTransport';
+import { IFsTransportOpts, FsTransport } from '../persistance/FsTransport';
 import { ILocalStorageTransport, LocalStorageTransport } from '../persistance/LocalStorageTransport';
 import { Cache } from '../Cache';
 import { ITransport } from '../persistance/Transport';
 import { ICacheOpts } from '../Cache';
 
 export interface ICachedWorkerOptions <T> {
-    transport: IFsTransport | ILocalStorageTransport
+    transport: IFsTransportOpts | ILocalStorageTransport
     worker: () => T
 }
 
@@ -16,10 +16,14 @@ export class CachedWorker <T> {
     private workerDfr: Promise<any>;
 
     constructor (private opts: ICachedWorkerOptions<T> & ICacheOpts) {
+        const persistance = opts.persistance ?? this.getTransport();
+        if (persistance) {
+            persistance.debounceMs = 0;
+        }
         this.cache = new Cache({
-            persistance: opts.persistance ?? this.getTransport(),
+            persistance,
             maxAge: opts.maxAge,
-            monitors: opts.monitors
+            monitors: opts.monitors,
         });
         this.worker = opts.worker;
     }

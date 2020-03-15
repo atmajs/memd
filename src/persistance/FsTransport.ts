@@ -1,7 +1,7 @@
 import { ITransport } from './Transport';
 import { ICacheEntryCollection } from '../Cache';
 
-export interface IFsTransport {
+export interface IFsTransportOpts {
     path: string
 }
 
@@ -10,7 +10,7 @@ export class FsTransport implements ITransport {
 
     isAsync = true;
 
-    constructor (public opts: IFsTransport) {
+    constructor (public opts: IFsTransportOpts) {
         if (typeof process === 'undefined' || typeof process.exit !== 'function') {
             throw new Error('NodeJS expected');
         }

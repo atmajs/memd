@@ -1,6 +1,5 @@
 import { ITransport } from './Transport';
 import { Cache, ICacheEntryCollection } from '../Cache';
-import { deco_debounce } from '../deco/debounce';
 
 export class TransportWorker {
     public isReady = false

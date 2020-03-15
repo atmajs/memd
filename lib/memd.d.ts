@@ -103,13 +103,13 @@ declare module 'memd/Cache' {
 declare module 'memd/persistance/FsTransport' {
     import { ITransport } from 'memd/persistance/Transport';
     import { ICacheEntryCollection } from 'memd/Cache';
-    export interface IFsTransport {
+    export interface IFsTransportOpts {
         path: string;
     }
     export class FsTransport implements ITransport {
-        opts: IFsTransport;
+        opts: IFsTransportOpts;
         isAsync: boolean;
-        constructor(opts: IFsTransport);
+        constructor(opts: IFsTransportOpts);
         restoreAsync(): Promise<any>;
         flushAsync(coll: ICacheEntryCollection): void;
     }
@@ -131,11 +131,11 @@ declare module 'memd/persistance/LocalStorageTransport' {
 }
 
 declare module 'memd/workers/CachedWorker' {
-    import { IFsTransport } from 'memd/persistance/FsTransport';
+    import { IFsTransportOpts } from 'memd/persistance/FsTransport';
     import { ILocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
     import { ICacheOpts } from 'memd/Cache';
     export interface ICachedWorkerOptions<T> {
-        transport: IFsTransport | ILocalStorageTransport;
+        transport: IFsTransportOpts | ILocalStorageTransport;
         worker: () => T;
     }
     export class CachedWorker<T> {
