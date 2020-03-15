@@ -58,7 +58,7 @@ export class CachedWorker <T> {
                 return result;
             }
             result = await this.opts.worker();
-            this.cache.set('result', result);
+            await this.cache.setAsync('result', result);
             return result;
         })());
     }

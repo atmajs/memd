@@ -94,6 +94,7 @@ declare module 'memd/Cache' {
         get(key: string): T;
         getAsync(key: string): Promise<T>;
         set(key: string, val: T): T;
+        setAsync(key: string, val: T): Promise<T>;
         setCollection(coll: ICacheEntryCollection): void;
         clear(key?: string): void;
         destroy(): void;

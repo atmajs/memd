@@ -69,6 +69,15 @@ export class Cache <T = any> {
         this._transport?.flush(this._cache);
         return val;
     }
+    async setAsync (key: string, val: T): Promise<T> {
+        this._cache[key] = {
+            timestamp: Date.now(),
+            value: val
+        };
+        
+        await this._transport?.flushAsync(this._cache);
+        return val;
+    }
     setCollection (coll: ICacheEntryCollection) {
         this._cache = coll ?? {};
     }

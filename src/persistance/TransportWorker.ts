@@ -3,12 +3,16 @@ import { Cache, ICacheEntryCollection } from '../Cache';
 
 export class TransportWorker {
     public isReady = false
+
     private isAsync = false;
     private lastModified: Date = null;
     private restorePromise: Promise<any> = null;
+    private coll: ICacheEntryCollection;
+    private flushRunner: AsyncRunner;
 
     constructor (private cache: Cache, private transport: ITransport) {
         this.isAsync = Boolean(this.transport.isAsync);
+        this.flushRunner = new AsyncRunner(() => this.flushInner(), this.transport.debounceMs ?? 500);
     }
 
     restore () {
@@ -44,52 +48,89 @@ export class TransportWorker {
     flush (coll: ICacheEntryCollection) {
         this.isReady = true;
         this.lastModified = new Date();
+        this.coll = coll;
 
-        if (this._flushTimeoutMs === 0) {
-            this.flushInner(coll);
-            return;
-        }
-
-        clearTimeout(this._flushTimeout);
-        this._flushTimeout = setTimeout(() => {
-            this.flushInner(coll);
-        });
-    }
-
-    private _flushTimeoutMs = this.transport.debounceMs ?? 500;
-    private _flushTimeout = null;
-    private _flushIsBusy = false;
-    private _flushNext: ICacheEntryCollection = null;
-
-    private flushInner (coll: ICacheEntryCollection) {
-        if (this.isAsync) {
-            this.flushInnerAsync(coll);
-            return;
-        }
-        this.flushInnerSync(coll);
-    }
-    private flushInnerSync (coll: ICacheEntryCollection) {
-        this.transport.flush(coll);
-    }
-    private flushInnerAsync (coll: ICacheEntryCollection) {
-        if (this._flushIsBusy) {
-            this._flushNext = coll;
-            return;
-        }
-        try {
-            this._flushIsBusy = true;
+        if (this.transport.debounceMs === 0) {
             this.transport.flush(coll);
+            return;
+        }
+        this.flushRunner.run();
+    }
+    async flushAsync (coll: ICacheEntryCollection) {
+        this.isReady = true;
+        this.lastModified = new Date();
+        this.coll = coll;
+        return this.flushRunner.run();
+    }
+
+    private flushInner () {
+        if (this.transport.isAsync) {
+            return this.transport.flushAsync(this.coll);
+        }
+        this.transport.flush(this.coll);
+    }
+
+}
+
+
+class AsyncRunner {
+    isWaiting = false;
+    isBusy = false;
+    timeout = null;
+    dfr: Deferred;
+    shouldRunNext = false;
+
+    constructor (public fn: () => Promise<any>, public debounce: number) {
+
+    }
+
+    run () {
+        if (this.isWaiting && !this.isBusy) {
+            this.reset();
+            return this.run();
+        }
+        if (this.isBusy) {
+            this.shouldRunNext = true;
+            return this.dfr.promise;
+        }
+        this.isWaiting = true;
+        this.isBusy = false;
+        this.dfr = new Deferred;
+        this.timeout = setTimeout(() => this.runInner(), this.debounce);
+        return this.dfr.promise;
+    }
+    private reset () {
+        clearTimeout(this.timeout);
+        this.isWaiting = false;
+        this.isBusy = false;
+        this.shouldRunNext = false;
+    }
+    private async runInner () {
+        this.isWaiting = false;
+        this.isBusy = true;
+        try {
+            await this.fn();
         } catch (error) {
-
+            console.error('Transport error', error);
         } finally {
-            this._flushIsBusy = false;
-
-            let next = this._flushNext;
-            if (next) {
-                this._flushNext = null;
-                this.flushInnerAsync(next);
+            const runNext = this.shouldRunNext;
+            this.dfr.resolve();
+            this.reset();
+            if (runNext) {
+                this.run();
             }
         }
+    }
+}
+class Deferred {
+    promise: Promise<any>
+    resolve: Function
+    reject: Function
 
+    constructor () {
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = resolve;
+            this.reject = reject;
+        });
     }
 }
