@@ -33,7 +33,7 @@ UTest({
             return letter.toUpperCase();
         });
         class Foo {
-            @deco_memoize({ maxAge: 50 })
+            @deco_memoize({ maxAge: .100 })
             foo (letter) {
                 return innerFn(letter)
             }
@@ -51,7 +51,7 @@ UTest({
             eq_(f.foo('a'), 'A');
             eq_(innerFn.callCount, 2);
             done();
-        }, 100);
+        }, 200);
     },
     'memoize with invalidation' () {
         const innerFn = sinon.spy(function (letter) {
@@ -76,5 +76,56 @@ UTest({
         f.foo('a');
         eq_(f.foo('a'), 'A');
         eq_(innerFn.callCount, 2);
+    },
+    'memoize with clear on': {
+        async 'using async' () {
+            const arr = [2, 1, 2, 4, 2];
+            const innerFn = sinon.spy(function (letter) {
+                return arr.shift();
+            });
+            const clearOn = sinon.spy(x => x === 2);
+            class Foo {
+                @deco_memoize({ clearOn })
+                async foo () {
+                    return innerFn()
+                }
+            }
+
+            let f = new Foo();
+            let result = [
+                await f.foo(),
+                await f.foo(),
+                await f.foo(),
+                await f.foo(),
+            ];
+            deepEq_(result, [2, 1, 1, 1]);
+            eq_(clearOn.callCount, 2);
+            eq_(innerFn.callCount, 2);
+            deepEq_(clearOn.args, [[2], [1]]);
+        },
+        async 'using sync flow' () {
+            const arr = [2, 1, 2, 4, 2];
+            const innerFn = sinon.spy(function (letter) {
+                return arr.shift();
+            });
+            const clearOn = sinon.spy(x => x === 2);
+            class Foo {
+                @deco_memoize({ clearOn })
+                foo () {
+                    return innerFn()
+                }
+            }
+
+            let f = new Foo();
+            let result = [
+                f.foo(),
+                f.foo(),
+                f.foo(),
+                f.foo(),
+            ];
+            deepEq_(result, [2, 1, 1, 1]);
+            eq_(clearOn.callCount, 2);
+            eq_(innerFn.callCount, 2);
+        }
     }
 })

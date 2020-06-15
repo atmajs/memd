@@ -72,6 +72,7 @@ declare module 'memd/fn/memoize' {
 declare module 'memd/Cache' {
     import { ITransport } from 'memd/persistance/Transport';
     export interface ICacheOpts {
+        /** In Seconds */
         maxAge?: number;
         monitors?: ICacheChangeEventMonitor[];
         keyResolver?: (...args: any[]) => string;

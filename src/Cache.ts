@@ -3,6 +3,7 @@ import { ITransport } from './persistance/Transport';
 import { TransportWorker } from './persistance/TransportWorker';
 
 export interface ICacheOpts {
+    /** In Seconds */
     maxAge?: number
     monitors?: ICacheChangeEventMonitor[]
     keyResolver?: (...args) => string
@@ -73,7 +74,7 @@ export class Cache <T = any> {
             timestamp: Date.now(),
             value: val
         };
-        
+
         this._transport?.flush(this._cache);
         return val;
     }
@@ -82,7 +83,7 @@ export class Cache <T = any> {
             timestamp: Date.now(),
             value: val
         };
-        
+
         await this._transport?.flushAsync(this._cache);
         return val;
     }
