@@ -13,8 +13,11 @@ export namespace Args {
         if (typeof misc !== 'object') {
             return misc;
         }
-        if (typeof misc.valueOf === 'function') {
-            return misc.valueOf();
+        if (misc instanceof Date) {
+            return misc.getTime();
+        }
+        if (misc instanceof Array) {
+            return getKey(misc);
         }
         let str = '';
         for (let key in misc) {
