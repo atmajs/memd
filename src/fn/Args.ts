@@ -6,13 +6,19 @@ export namespace Args {
         }
         return key;
     }
-    function getKeySingle (x: any) {
-        if (typeof x !== 'object') {
-            return x;
+    function getKeySingle (misc: any) {
+        if (misc == null) {
+            return '';
+        }
+        if (typeof misc !== 'object') {
+            return misc;
+        }
+        if (typeof misc.valueOf === 'function') {
+            return misc.valueOf();
         }
         let str = '';
-        for (let key in x) {
-            str += '.' + getKeySingle(x[key]);
+        for (let key in misc) {
+            str += '.' + getKeySingle(misc[key]);
         }
         return str;
     }

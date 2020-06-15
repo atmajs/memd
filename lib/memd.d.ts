@@ -64,6 +64,7 @@ declare module 'memd/fn/memoize' {
     export interface IMemoizeOpts {
         perInstance?: boolean;
         clearOnReject?: boolean;
+        clearOn?: (val: any) => boolean;
     }
     export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper & T;
 }
@@ -97,6 +98,7 @@ declare module 'memd/Cache' {
         setAsync(key: string, val: T): Promise<T>;
         setCollection(coll: ICacheEntryCollection): void;
         clear(key?: string): void;
+        clearAsync(key?: string): Promise<void>;
         destroy(): void;
     }
 }
@@ -112,7 +114,7 @@ declare module 'memd/persistance/FsTransport' {
         isAsync: boolean;
         constructor(opts: IFsTransportOpts);
         restoreAsync(): Promise<any>;
-        flushAsync(coll: ICacheEntryCollection): void;
+        flushAsync(coll: ICacheEntryCollection): any;
     }
 }
 

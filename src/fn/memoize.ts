@@ -4,11 +4,13 @@ import { Cache, ICacheOpts } from '../Cache'
 export interface IMemoizeOpts {
     perInstance?: boolean
     clearOnReject?: boolean
+    clearOn?: (val) => boolean
 }
 
 export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper & T {
     let _perInstance = opts?.perInstance ?? false;
     let _clearOnReject = opts?.clearOnReject ?? false;
+    let _clearOn = opts?.clearOn ?? null;
     let _cache = new Cache(opts);
     let _caches = [] as Cache[];
 
@@ -31,13 +33,32 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
         if (cached != null) {
             return cached;
         }
+        let isPromise = null as boolean;
         let val = fn.apply(this, args);
-        if (_clearOnReject === true && val != null && typeof val === 'object' && typeof val.then === 'function') {
-            val = val.then(null, err => {
-                cache.clear(id);
-                return Promise.reject(err);
-            });
+        if (_clearOnReject === true) {
+            isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
+            if (isPromise) {
+                val = val.then(null, err => {
+                    cache.clear(id);
+                    return Promise.reject(err);
+                });
+            }
         }
+        if (_clearOn != null) {
+            isPromise = isPromise ??  (val != null && typeof val === 'object' && typeof val.then === 'function');
+            if (isPromise) {
+                val = val.then(result => {
+                    if (_clearOn(result)) {
+                        cache.clear(id);
+                    }
+                    return result;
+                });
+            } else if (_clearOn(val)) {
+                // don't even set to cache
+                return val;
+            }
+        }
+
         return cache.set(id, val);
     };
     Wrapper.clearArgs = function (...args) {

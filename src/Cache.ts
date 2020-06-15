@@ -58,7 +58,15 @@ export class Cache <T = any> {
         if (this._transport != null && this._transport.isReady === false) {
             await this._transport.restoreAsync();
         }
-        return this.get(key);
+        let entry = this._cache[key];
+        if (entry == null) {
+            return null;
+        }
+        if (this.options.maxAge && ((Date.now() - entry.timestamp) / 1000) > this.options.maxAge) {
+            await this.clearAsync(key);
+            return null;
+        }
+        return entry.value;
     }
     set (key: string, val: T): T {
         this._cache[key] = {
@@ -85,11 +93,18 @@ export class Cache <T = any> {
     clear (key?: string) {
         if (typeof key === 'string') {
             this._cache[key] = null;
-            this._transport?.flush(this._cache);
-            return;
+        } else {
+            this._cache = {};
         }
-        this._cache = {};
         this._transport?.flush(this._cache);
+    }
+    async clearAsync (key?: string) {
+        if (typeof key === 'string') {
+            this._cache[key] = null;
+        } else {
+            this._cache = {};
+        }
+        await this._transport?.flushAsync(this._cache);
     }
 
     destroy () {

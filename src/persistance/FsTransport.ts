@@ -26,6 +26,6 @@ export class FsTransport implements ITransport {
         return this.File.readAsync(this.opts.path);
     }
     flushAsync (coll: ICacheEntryCollection) {
-        this.File.writeAsync(this.opts.path, coll);
+        return this.File.writeAsync(this.opts.path, coll);
     }
 }
