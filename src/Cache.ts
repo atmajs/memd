@@ -49,7 +49,7 @@ export class Cache <T = any> {
         if (entry == null) {
             return null;
         }
-        if (this.options.maxAge && ((Date.now() - entry.timestamp) / 1000) > this.options.maxAge) {
+        if (this.options.maxAge != null && ((Date.now() - entry.timestamp) / 1000) > this.options.maxAge) {
             this.clear(key);
             return null;
         }
@@ -63,7 +63,7 @@ export class Cache <T = any> {
         if (entry == null) {
             return null;
         }
-        if (this.options.maxAge && ((Date.now() - entry.timestamp) / 1000) > this.options.maxAge) {
+        if (this.options.maxAge != null && ((Date.now() - entry.timestamp) / 1000) > this.options.maxAge) {
             await this.clearAsync(key);
             return null;
         }
