@@ -5,7 +5,7 @@ declare module 'memd' {
     import { deco_debounce } from 'memd/deco/debounce';
     import { deco_throttle } from 'memd/deco/throttle';
     import { deco_queued } from 'memd/deco/queued';
-    import { fn_memoize } from 'memd/fn/memoize';
+    import { fn_clearMemoized, fn_memoize } from 'memd/fn/memoize';
     import { Cache } from 'memd/Cache';
     import { FsTransport } from 'memd/persistance/FsTransport';
     import { LocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
@@ -14,6 +14,7 @@ declare module 'memd' {
         static Cache: typeof Cache;
         static fn: {
             memoize: typeof fn_memoize;
+            clearMemoized: typeof fn_clearMemoized;
         };
         static deco: {
             memoize: typeof deco_memoize;
@@ -67,6 +68,7 @@ declare module 'memd/fn/memoize' {
         clearOn?: (val: any) => boolean;
     }
     export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper & T;
+    export function fn_clearMemoized(fn: Function, ...args: any[]): void;
 }
 
 declare module 'memd/Cache' {

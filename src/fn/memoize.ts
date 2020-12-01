@@ -73,3 +73,11 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
     return Wrapper;
 };
 
+export function fn_clearMemoized (fn: Function, ...args: any[]) {
+    if (args.length === 0) {
+        (fn as any)?.clearAll?.();
+        return;
+    }
+    (fn as any)?.clearArgs?.(...args);
+    return;
+}

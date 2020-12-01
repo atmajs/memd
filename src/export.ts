@@ -2,7 +2,7 @@ import { deco_memoize } from './deco/memoize';
 import { deco_debounce } from './deco/debounce';
 import { deco_throttle } from './deco/throttle';
 import { deco_queued } from './deco/queued';
-import { fn_memoize } from './fn/memoize';
+import { fn_clearMemoized, fn_memoize } from './fn/memoize';
 import { Cache } from './Cache'
 import { FsTransport } from './persistance/FsTransport';
 import { LocalStorageTransport } from './persistance/LocalStorageTransport';
@@ -12,7 +12,8 @@ class Memd {
 
     static Cache = Cache
     static fn = {
-        memoize: fn_memoize
+        memoize: fn_memoize,
+        clearMemoized: fn_clearMemoized
     }
     static deco = {
         memoize: deco_memoize,
