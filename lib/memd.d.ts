@@ -10,10 +10,12 @@ declare module 'memd' {
     import { FsTransport } from 'memd/persistance/FsTransport';
     import { LocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
     import { CachedWorker } from 'memd/workers/CachedWorker';
+    import { fn_queued } from 'memd/fn/queued';
     class Memd {
         static Cache: typeof Cache;
         static fn: {
             memoize: typeof fn_memoize;
+            queued: typeof fn_queued;
             clearMemoized: typeof fn_clearMemoized;
         };
         static deco: {
@@ -65,6 +67,7 @@ declare module 'memd/fn/memoize' {
     import { ICacheOpts } from 'memd/Cache';
     export interface IMemoizeOpts {
         perInstance?: boolean;
+        clearOnReady?: boolean;
         clearOnReject?: boolean;
         clearOn?: (val: any) => boolean;
     }
@@ -152,6 +155,18 @@ declare module 'memd/workers/CachedWorker' {
         static run<T>(opts: ICachedWorkerOptions<T> & ICacheOpts): T;
         static runAsync<T>(opts: ICachedWorkerOptions<T> & ICacheOpts): Promise<T>;
     }
+}
+
+declare module 'memd/fn/queued' {
+    interface IQueueOpts {
+        /** When fn is active all further calls will receive active promise */
+        single?: boolean;
+        /** When fn is called and the queue already has waiters - remove them */
+        trimQueue?: boolean;
+        timeout?: number;
+    }
+    export function fn_queued<T extends Function>(fn: T, opts?: IQueueOpts): T;
+    export {};
 }
 
 declare module 'memd/model/IMemoizeWrapper' {

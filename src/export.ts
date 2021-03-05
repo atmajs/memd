@@ -7,12 +7,14 @@ import { Cache } from './Cache'
 import { FsTransport } from './persistance/FsTransport';
 import { LocalStorageTransport } from './persistance/LocalStorageTransport';
 import { CachedWorker } from './workers/CachedWorker';
+import { fn_queued } from './fn/queued';
 
 class Memd {
 
     static Cache = Cache
     static fn = {
         memoize: fn_memoize,
+        queued: fn_queued,
         clearMemoized: fn_clearMemoized
     }
     static deco = {

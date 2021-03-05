@@ -3,12 +3,14 @@ import { Cache, ICacheOpts } from '../Cache'
 
 export interface IMemoizeOpts {
     perInstance?: boolean
+    clearOnReady?: boolean
     clearOnReject?: boolean
     clearOn?: (val) => boolean
 }
 
 export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper & T {
     let _perInstance = opts?.perInstance ?? false;
+    let _clearOnReady = opts?.clearOnReady ?? false;
     let _clearOnReject = opts?.clearOnReject ?? false;
     let _clearOn = opts?.clearOn ?? null;
     let _cache = new Cache(opts);
@@ -39,6 +41,18 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
             isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
             if (isPromise) {
                 val = val.then(null, err => {
+                    cache.clear(id);
+                    return Promise.reject(err);
+                });
+            }
+        }
+        if (_clearOnReady === true) {
+            isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
+            if (isPromise) {
+                val = val.then(result => {
+                    cache.clear(id);
+                    return Promise.resolve(result);
+                }, err => {
                     cache.clear(id);
                     return Promise.reject(err);
                 });
