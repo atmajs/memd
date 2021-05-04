@@ -59,6 +59,7 @@ declare module 'memd/deco/queued' {
     export function deco_queued(opts?: {
         trimQueue?: boolean;
         timeout?: number;
+        throttle?: number;
     }): (target: any, propertyKey: any, descriptor?: any) => any;
 }
 
@@ -168,6 +169,8 @@ declare module 'memd/fn/queued' {
         /** When fn is called and the queue already has waiters - remove them */
         trimQueue?: boolean;
         timeout?: number;
+        /** method call frequence */
+        throttle?: number;
     }
     export function fn_queued<T extends Function>(fn: T, opts?: IQueueOpts): T;
     export {};
