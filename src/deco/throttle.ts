@@ -19,7 +19,7 @@ export function deco_throttle (timeWindow: number, shouldCallLater?: boolean) {
                 if (shouldCallLater !== true) {
                     fn.apply(self, args);
                     return;
-                }                    
+                }
             }
             latestArgs = args;
             if (timer === 0) {

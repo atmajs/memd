@@ -6,6 +6,8 @@
 
 * Memoize, debounce, throttle and queue methods
 * Object Cache
+* Persistance: (File, LocalStorage, Custom)
+* NodeJS/Browser
 
 ```typescript
 
@@ -66,7 +68,7 @@ interface IMemoizeOpts {
 When `ms` is `0` or `undefined` then `requestAnimationFrame` or `setImmediate` is used.
 
 ```ts
-.memoize(ms: number = 0)
+.debounce(ms: number = 0)
 ```
 
 ### `throttle`
@@ -80,7 +82,7 @@ When `ms` is `0` or `undefined` then `requestAnimationFrame` or `setImmediate` i
 Calls method only when the previous promise is resolved. Use `trimQueue: true` to ensure the queue consists of max 1 listener.
 
 ```ts
-async .queued(opts: { trimQueue?: boolean })
+.queued(opts: { trimQueue?: boolean, timeout?: number, throttle?: number })
 ```
 
 

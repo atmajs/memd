@@ -8,11 +8,16 @@ interface IQueueOpts {
     /** When fn is called and the queue already has waiters - remove them */
     trimQueue?: boolean
     timeout?: number
+
+    /** method call frequence */
+    throttle?: number
 }
 export function fn_queued<T extends Function>(fn: T, opts: IQueueOpts = {}): T {
 
     let queue = [] as ReturnType<typeof Queued['prepair']>[];
     let busy = false;
+    let lastResultAt = 0;
+    let throttle = opts?.throttle;
     let resultFn = function (...args) {
         if (opts != null && opts.single === true && queue.length > 0) {
             return queue[0].promise;
@@ -29,14 +34,25 @@ export function fn_queued<T extends Function>(fn: T, opts: IQueueOpts = {}): T {
         return wrapped.promise;
     };
     let tick = function () {
-        let x = queue.shift();
-        if (x == null) {
+        if (queue.length === 0) {
             busy = false;
             return;
         }
-        x.always(tick);
+        if (throttle != null) {
+            let ms = throttle - (Date.now() - lastResultAt);
+            if (ms > 0) {
+                setTimeout(tick, ms);
+                return;
+            }
+        }
+        let x = queue.shift();
+        x.always(next);
         x.run();
     };
+    let next = function () {
+        lastResultAt = Date.now();
+        tick();
+    }
     return resultFn as any as T;
 }
 

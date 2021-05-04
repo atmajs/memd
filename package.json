@@ -27,7 +27,7 @@
         "watch": "app-bundler --watch",
         "server": "atma server",
         "build-dts": "tsc -p tsconfig-build.json && atma custom tools/build-dts",
-        "release": "atma bump && npm run build && git add -A && git commit -am \"bump\" && git push && npm publish"
+        "release": "echo \"Run atma pub -m \"message\"\""
     },
     "license": "MIT",
     "app-bundler": {

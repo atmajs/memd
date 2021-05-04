@@ -1,6 +1,10 @@
 import { fn_queued } from '../fn/queued';
 
-export function deco_queued (opts: { trimQueue?: boolean, timeout?: number } = null) {
+export function deco_queued (opts: {
+    trimQueue?: boolean,
+    timeout?: number,
+    throttle?: number
+} = null) {
     return function (target, propertyKey, descriptor?) {
         let viaProperty = descriptor == null;
         let fn = viaProperty ? target[propertyKey] : descriptor.value;
