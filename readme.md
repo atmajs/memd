@@ -12,16 +12,16 @@
 import { deco } from 'memd';
 
 class Foo {
-    @deco.memoize() 
+    @deco.memoize()
     foo () {}
 
-    @deco.debounce() 
+    @deco.debounce()
     bar () {}
 
-    @deco.throttle() 
+    @deco.throttle()
     qux () {}
 
-    @deco.queue() 
+    @deco.queue()
     async dex () {}
 }
 ```
@@ -63,7 +63,7 @@ interface IMemoizeOpts {
 
 ### `debounce`
 
-When `ms` is `0` or `undefined` then `requestAnimationFrame` or `setImmediate` is used. 
+When `ms` is `0` or `undefined` then `requestAnimationFrame` or `setImmediate` is used.
 
 ```ts
 .memoize(ms: number = 0)
@@ -81,6 +81,69 @@ Calls method only when the previous promise is resolved. Use `trimQueue: true` t
 
 ```ts
 async .queued(opts: { trimQueue?: boolean })
+```
+
+
+## Transport and Store for Cache/Memoize
+
+### Transport
+
+Persist all cached data to the backed store, to be able to restore on app restarts
+##### (`NodeJS`) Files
+
+```js
+import memd from 'memd'
+const fs = new memd.FsTransport({ path: './lorem.json' });
+class Foo {
+
+    @memd.deco.memoize({ transport: fs })
+    foo (bar) {
+        // do smth
+    }
+}
+```
+
+##### (`Browser`) localStorage
+
+```js
+import memd from 'memd'
+
+const storage = new memd.LocalStorageTransport({ key: 'foo' });
+class Foo {
+
+    @memd.deco.memoize({ transport: storage })
+    foo (bar) {
+        // do smth
+    }
+}
+```
+
+
+### Store
+
+Read and Save single values from store
+
+```js
+import memd from 'memd'
+
+const store = {
+    getAsync (key: string, ...args) {
+        // get cached value if any
+        return {
+            value: 'bar'
+        }
+    },
+    saveAsync (key: string, entry: { value: any, timestamp: number }) {
+        // save cached value
+    }
+}
+class Foo {
+
+    @memd.deco.memoize({ store })
+    foo (bar) {
+        // do smth
+    }
+}
 ```
 
 ----

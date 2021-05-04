@@ -1,10 +1,10 @@
-import { ITransport } from './Transport';
+import { ITransport } from './ITransport';
 import { Cache, ICacheEntryCollection } from '../Cache';
 
 export class TransportWorker {
     public isReady = false
+    public isAsync = false;
 
-    private isAsync = false;
     private lastModified: Date = null;
     private restorePromise: Promise<any> = null;
     private coll: ICacheEntryCollection;

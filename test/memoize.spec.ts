@@ -154,7 +154,7 @@ UTest({
 
         let result3 = await promise3;
         eq_(result3, 3);
-    }
+    },
 })
 
 async function wait(ms) {

@@ -1,7 +1,7 @@
 import { IFsTransportOpts, FsTransport } from '../persistance/FsTransport';
 import { ILocalStorageTransport, LocalStorageTransport } from '../persistance/LocalStorageTransport';
 import { Cache } from '../Cache';
-import { ITransport } from '../persistance/Transport';
+import { ITransport } from '../persistance/ITransport';
 import { ICacheOpts } from '../Cache';
 
 export interface ICachedWorkerOptions <T> {
@@ -10,7 +10,7 @@ export interface ICachedWorkerOptions <T> {
 }
 
 export class CachedWorker <T> {
-    
+
     private cache: Cache
     private worker: () => (T | Promise<T>)
     private workerDfr: Promise<any>;

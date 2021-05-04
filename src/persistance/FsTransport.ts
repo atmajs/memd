@@ -1,4 +1,4 @@
-import { ITransport } from './Transport';
+import { ITransport } from './ITransport';
 import { ICacheEntryCollection } from '../Cache';
 
 export interface IFsTransportOpts {

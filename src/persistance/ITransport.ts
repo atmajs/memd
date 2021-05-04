@@ -10,3 +10,5 @@ export interface ITransport <T = any> {
     flush? (data: ICacheEntryCollection<T>)
     flushAsync? (data: ICacheEntryCollection<T>)
 }
+
+

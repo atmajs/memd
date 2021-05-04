@@ -2,7 +2,10 @@ export namespace Args {
     export function getKey(args: any[]) {
         let key = '';
         for (let i = 0; i < args.length; i++) {
-            key += '.' + getKeySingle(args[i]);
+            if (i > 0) {
+                key += '.';
+            }
+            key += getKeySingle(args[i]);
         }
         return key;
     }

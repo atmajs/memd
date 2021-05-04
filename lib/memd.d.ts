@@ -76,20 +76,23 @@ declare module 'memd/fn/memoize' {
 }
 
 declare module 'memd/Cache' {
-    import { ITransport } from 'memd/persistance/Transport';
+    import { ITransport } from 'memd/persistance/ITransport';
+    import { IStore } from "memd/persistance/IStore";
     export interface ICacheOpts {
         /** In Seconds */
         maxAge?: number;
         monitors?: ICacheChangeEventMonitor[];
         keyResolver?: (...args: any[]) => string;
         persistance?: ITransport;
+        store?: IStore;
+        doNotWaitSave?: boolean;
     }
     export interface ICacheChangeEventMonitor {
         on(event: 'change', fn: Function): any;
         off(event: 'change', fn: Function): any;
     }
     export interface ICacheEntry<T = any> {
-        timestamp: number;
+        timestamp?: number;
         value: T;
     }
     export interface ICacheEntryCollection<T = any> {
@@ -97,10 +100,11 @@ declare module 'memd/Cache' {
     }
     export class Cache<T = any> {
         options: ICacheOpts;
+        isAsync: boolean;
         constructor(options?: ICacheOpts);
         resolveKey(...args: any[]): string;
-        get(key: string): T;
-        getAsync(key: string): Promise<T>;
+        get(key: string, ...args: any[]): T;
+        getAsync(key: string, ...args: any[]): Promise<T>;
         set(key: string, val: T): T;
         setAsync(key: string, val: T): Promise<T>;
         setCollection(coll: ICacheEntryCollection): void;
@@ -111,7 +115,7 @@ declare module 'memd/Cache' {
 }
 
 declare module 'memd/persistance/FsTransport' {
-    import { ITransport } from 'memd/persistance/Transport';
+    import { ITransport } from 'memd/persistance/ITransport';
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface IFsTransportOpts {
         path: string;
@@ -126,7 +130,7 @@ declare module 'memd/persistance/FsTransport' {
 }
 
 declare module 'memd/persistance/LocalStorageTransport' {
-    import { ITransport } from 'memd/persistance/Transport';
+    import { ITransport } from 'memd/persistance/ITransport';
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface ILocalStorageTransport {
         key: string;
@@ -176,7 +180,7 @@ declare module 'memd/model/IMemoizeWrapper' {
     }
 }
 
-declare module 'memd/persistance/Transport' {
+declare module 'memd/persistance/ITransport' {
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface ITransport<T = any> {
         isAsync: boolean;
@@ -185,6 +189,18 @@ declare module 'memd/persistance/Transport' {
         restoreAsync?(): Promise<ICacheEntryCollection<T>>;
         flush?(data: ICacheEntryCollection<T>): any;
         flushAsync?(data: ICacheEntryCollection<T>): any;
+    }
+}
+
+declare module 'memd/persistance/IStore' {
+    import { ICacheEntry } from 'memd/Cache';
+    export interface IStore<T = any> {
+        get?(key: string, ...args: any[]): ICacheEntry<T>;
+        getAsync?(key: string, ...args: any[]): Promise<ICacheEntry<T>>;
+        save?(key: string, entry: ICacheEntry<T>): void;
+        saveAsync?(key: string, entry: ICacheEntry<T>): Promise<void>;
+        clear?(key: string): void;
+        clearAsync?(key: string): Promise<void>;
     }
 }
 

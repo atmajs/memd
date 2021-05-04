@@ -1,5 +1,5 @@
 import { Cache } from '../src/Cache'
-import { ITransport } from '../src/persistance/Transport'
+import { ITransport } from '../src/persistance/ITransport'
 
 class Mem implements ITransport{
     mem = null
@@ -43,13 +43,13 @@ UTest({
         let ageMs = 30 * 24 * 60 * 60 * 1000;
         let db = new (class extends Mem{
             mem = {
-                foo: { 
+                foo: {
                     timestamp: Date.now() - ageMs,
                     value: 'baz'
                 }
             }
         });
-        
+
         let cacheValid = new Cache({
             persistance: db,
             maxAge: ageMs / 1000 + 1
