@@ -104,26 +104,41 @@ export class Cache <T = any> {
             value: val
         };
         this._cache[key] = cached;
-        if (this._transport != null) {
-            this._transport.flush(this._cache);
-        }
-        if (this._store != null) {
-            this._store.save(key, cached);
-        }
+
+        this.persist(key, cached, false);
         return val;
     }
+    private async persist (key: string, entry: ICacheEntry, isAsync: boolean) {
+        const transport = this._transport;
+        const store = this._store;
+        if (transport == null && store == null) {
+            return;
+        }
+        let val = entry.value;
+        let isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
+        if (isPromise) {
+            val = await val;
+            entry = {
+                value: val,
+                timestamp: entry.timestamp,
+            };
+        }
+        if (isAsync) {
+            await this._transport?.flushAsync(key, entry);
+            await this._store?.saveAsync(key, entry);
+        } else {
+            this._transport?.flush(key, entry);
+            this._store?.save(key, entry);
+        }
+    }
+
     async setAsync (key: string, val: T): Promise<T> {
         const cached = {
             timestamp: Date.now(),
             value: val
         };
         this._cache[key] = cached;
-        if (this._transport != null) {
-            await this._transport.flushAsync(this._cache);
-        }
-        if (this._store != null) {
-            await this._store.saveAsync(key, cached);
-        }
+        this.persist(key, cached, true)
         return val;
     }
     setCollection (coll: ICacheEntryCollection) {
@@ -136,7 +151,7 @@ export class Cache <T = any> {
         } else {
             this._cache = {};
         }
-        this._transport?.flush(this._cache);
+        this._transport?.clear(key);
         this._store?.clear(key);
     }
     async clearAsync (key?: string) {
@@ -145,7 +160,7 @@ export class Cache <T = any> {
         } else {
             this._cache = {};
         }
-        await this._transport?.flushAsync(this._cache);
+        await this._transport?.clearAsync(key);
         this._store?.clearAsync(key);
     }
 

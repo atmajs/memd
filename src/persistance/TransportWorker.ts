@@ -1,5 +1,5 @@
 import { ITransport } from './ITransport';
-import { Cache, ICacheEntryCollection } from '../Cache';
+import { Cache, ICacheEntry, ICacheEntryCollection } from '../Cache';
 
 export class TransportWorker {
     public isReady = false
@@ -7,7 +7,7 @@ export class TransportWorker {
 
     private lastModified: Date = null;
     private restorePromise: Promise<any> = null;
-    private coll: ICacheEntryCollection;
+    private coll: ICacheEntryCollection = {}
     private flushRunner: AsyncRunner;
 
     constructor (private cache: Cache, private transport: ITransport) {
@@ -45,22 +45,34 @@ export class TransportWorker {
         })());
     }
 
-    flush (coll: ICacheEntryCollection) {
+    flush (key: string, entry: ICacheEntry) {
         this.isReady = true;
         this.lastModified = new Date();
-        this.coll = coll;
+        this.coll[key] = entry;
 
         if (this.transport.debounceMs === 0) {
-            this.transport.flush(coll);
+            this.transport.flush(this.coll);
             return;
         }
         this.flushRunner.run();
     }
-    async flushAsync (coll: ICacheEntryCollection) {
+    async flushAsync (key: string, entry: ICacheEntry) {
         this.isReady = true;
         this.lastModified = new Date();
-        this.coll = coll;
+        this.coll[key] = entry;
         return this.flushRunner.run();
+    }
+
+    clear (key?: string) {
+        if (key != null) {
+            delete this.coll[key];
+        } else {
+            this.coll = {};
+        }
+        return this.flushRunner.run();
+    }
+    async clearAsync (key?: string) {
+        return this.clear(key);
     }
 
     private flushInner () {
