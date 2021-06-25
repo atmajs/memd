@@ -57,9 +57,16 @@ export class TransportWorker {
         this.flushRunner.run();
     }
     async flushAsync (key: string, entry: ICacheEntry) {
-        this.isReady = true;
+        if (this.isReady === false) {
+            await this.restoreAsync();
+        }
         this.lastModified = new Date();
         this.coll[key] = entry;
+        return this.flushRunner.run();
+    }
+
+    async flushAsyncAll () {
+
         return this.flushRunner.run();
     }
 
@@ -96,10 +103,10 @@ class AsyncRunner {
 
     }
 
-    run () {
+    async run ():Promise<any> {
         if (this.isWaiting && !this.isBusy) {
-            this.reset();
-            return this.run();
+            this.defer();
+            return this.dfr.promise;
         }
         if (this.isBusy) {
             this.shouldRunNext = true;
@@ -108,8 +115,15 @@ class AsyncRunner {
         this.isWaiting = true;
         this.isBusy = false;
         this.dfr = new Deferred;
-        this.timeout = setTimeout(() => this.runInner(), this.debounce);
+
+        this.defer()
         return this.dfr.promise;
+    }
+    private defer () {
+        if (this.isWaiting) {
+            clearTimeout(this.timeout);
+        }
+        this.timeout = setTimeout(() => this.runInner(), this.debounce);
     }
     private reset () {
         clearTimeout(this.timeout);
@@ -118,19 +132,19 @@ class AsyncRunner {
         this.shouldRunNext = false;
     }
     private async runInner () {
+
         this.isWaiting = false;
         this.isBusy = true;
         try {
             await this.fn();
         } catch (error) {
             console.error('Transport error', error);
-        } finally {
-            const runNext = this.shouldRunNext;
-            this.dfr.resolve();
-            this.reset();
-            if (runNext) {
-                this.run();
-            }
+        }
+        const runNext = this.shouldRunNext;
+        this.dfr.resolve(null);
+        this.reset();
+        if (runNext) {
+            this.run();
         }
     }
 }
@@ -144,5 +158,13 @@ class Deferred {
             this.resolve = resolve;
             this.reject = reject;
         });
+
     }
+}
+
+
+function wait (ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
 }

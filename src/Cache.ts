@@ -172,4 +172,8 @@ export class Cache <T = any> {
     private onChanged (key?: string) {
         this.clear(key);
     }
+
+    async flushAsync () {
+        await this._transport?.flushAsyncAll();
+    }
 }

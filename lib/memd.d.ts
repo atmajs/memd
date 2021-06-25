@@ -112,6 +112,7 @@ declare module 'memd/Cache' {
         clear(key?: string): void;
         clearAsync(key?: string): Promise<void>;
         destroy(): void;
+        flushAsync(): Promise<void>;
     }
 }
 
@@ -126,7 +127,7 @@ declare module 'memd/persistance/FsTransport' {
         isAsync: boolean;
         constructor(opts: IFsTransportOpts);
         restoreAsync(): Promise<any>;
-        flushAsync(coll: ICacheEntryCollection): any;
+        flushAsync(coll: ICacheEntryCollection): Promise<any>;
     }
 }
 

@@ -6,7 +6,7 @@ export interface IFsTransportOpts {
 }
 
 export class FsTransport implements ITransport {
-    private File = <any> null
+    private _file = <any> null
 
     isAsync = true;
 
@@ -16,16 +16,21 @@ export class FsTransport implements ITransport {
         }
         const r = require;
         const module = 'atma-io';
-        this.File = r(module).File;
+        const FileSafe = r(module).FileSafe;
+
+        this._file = new FileSafe(this.opts.path, { threadSafe: true });
     }
 
     async restoreAsync () {
-        if (await this.File.existsAsync(this.opts.path) === false) {
+        try {
+            let str = await this._file.readAsync();
+            return JSON.parse(str);
+        } catch (error) {
             return {};
         }
-        return this.File.readAsync(this.opts.path);
     }
-    flushAsync (coll: ICacheEntryCollection) {
-        return this.File.writeAsync(this.opts.path, coll);
+    async flushAsync (coll: ICacheEntryCollection) {
+        let json = JSON.stringify(coll);
+        return await this._file.writeAsync(json);
     }
 }
