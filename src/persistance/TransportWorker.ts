@@ -54,17 +54,12 @@ export class TransportWorker {
         }
         this.flushRunner.run();
     }
-    async flushAsync (key: string, entry: ICacheEntry) {
+    async flushAsync (force?: boolean) {
         if (this.isReady === false) {
             await this.restoreAsync();
         }
         this.lastModified = new Date();
-        return this.flushRunner.run();
-    }
-
-    async flushAsyncAll () {
-
-        return this.flushRunner.run();
+        return this.flushRunner.run(force);
     }
 
     clear () {
@@ -100,9 +95,9 @@ class AsyncRunner {
 
     }
 
-    async run ():Promise<any> {
+    async run (force?: boolean):Promise<any> {
         if (this.isWaiting && !this.isBusy) {
-            this.defer();
+            this.defer(force);
             return this.dfr.promise;
         }
         if (this.isBusy) {
@@ -113,12 +108,16 @@ class AsyncRunner {
         this.isBusy = false;
         this.dfr = new Deferred;
 
-        this.defer()
+        this.defer(force)
         return this.dfr.promise;
     }
-    private defer () {
+    private defer (force?: boolean) {
         if (this.isWaiting) {
             clearTimeout(this.timeout);
+        }
+        if (force === true) {
+            this.runInner();
+            return;
         }
         this.timeout = setTimeout(() => this.runInner(), this.debounce);
     }

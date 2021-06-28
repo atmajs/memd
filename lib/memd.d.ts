@@ -115,7 +115,8 @@ declare module 'memd/Cache' {
         clear(key?: string): void;
         clearAsync(key?: string): Promise<void>;
         destroy(): void;
-        flushAsync(): Promise<void>;
+        flushAsync(force?: boolean): Promise<void>;
+        static flushAllAsync(): Promise<void>;
     }
 }
 
