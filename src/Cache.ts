@@ -145,11 +145,17 @@ export class Cache <T = any> {
             value: val
         };
         this._cache[key] = cached;
-        this.persist(key, cached, true)
+        this.persist(key, cached, true);
         return val;
     }
-    setCollection (coll: ICacheEntryCollection) {
-        this._cache = coll ?? {};
+    setRestored (coll: ICacheEntryCollection) {
+        this._cache = {
+            ...(coll ?? {}),
+            ...(this._cache ?? {}),
+        };
+    }
+    getCollection () {
+        return this._cache;
     }
 
     clear (key?: string) {
@@ -158,7 +164,7 @@ export class Cache <T = any> {
         } else {
             this._cache = {};
         }
-        this._transport?.clear(key);
+        this._transport?.clear();
         this._store?.clear(key);
     }
     async clearAsync (key?: string) {
@@ -167,7 +173,7 @@ export class Cache <T = any> {
         } else {
             this._cache = {};
         }
-        await this._transport?.clearAsync(key);
+        await this._transport?.clearAsync();
         this._store?.clearAsync(key);
     }
 

@@ -43,9 +43,8 @@ UTest({
         has_(data, String(rand1));
         has_(data, String(rand2));
         has_(data, String(rand3));
-        console.log(data);
     },
-    async '!fs cache read' () {
+    async 'fs cache read' () {
         let model = {
             foo: {
                 value: Date.now()

@@ -7,7 +7,6 @@ export class TransportWorker {
 
     private lastModified: Date = null;
     private restorePromise: Promise<any> = null;
-    private coll: ICacheEntryCollection = {}
     private flushRunner: AsyncRunner;
 
     constructor (private cache: Cache, private transport: ITransport) {
@@ -23,7 +22,7 @@ export class TransportWorker {
             throw new Error('Transport is Async');
         }
         let coll = this.transport.restore();
-        this.cache.setCollection(coll);
+        this.cache.setRestored(coll);
         this.isReady = true;
     }
 
@@ -40,7 +39,7 @@ export class TransportWorker {
             if (this.isReady) {
                 return;
             }
-            this.cache.setCollection(coll);
+            this.cache.setRestored(coll);
             this.isReady = true;
         })());
     }
@@ -48,10 +47,9 @@ export class TransportWorker {
     flush (key: string, entry: ICacheEntry) {
         this.isReady = true;
         this.lastModified = new Date();
-        this.coll[key] = entry;
 
         if (this.transport.debounceMs === 0) {
-            this.transport.flush(this.coll);
+            this.transport.flush(this.cache.getCollection());
             return;
         }
         this.flushRunner.run();
@@ -61,7 +59,6 @@ export class TransportWorker {
             await this.restoreAsync();
         }
         this.lastModified = new Date();
-        this.coll[key] = entry;
         return this.flushRunner.run();
     }
 
@@ -70,23 +67,23 @@ export class TransportWorker {
         return this.flushRunner.run();
     }
 
-    clear (key?: string) {
-        if (key != null) {
-            delete this.coll[key];
-        } else {
-            this.coll = {};
-        }
+    clear () {
         return this.flushRunner.run();
     }
-    async clearAsync (key?: string) {
-        return this.clear(key);
+    async clearAsync () {
+        return this.clear();
+    }
+
+    getCollection () {
+        return this.cache.getCollection();
     }
 
     private flushInner () {
+        let coll = this.cache.getCollection();
         if (this.transport.isAsync) {
-            return this.transport.flushAsync(this.coll);
+            return this.transport.flushAsync(coll);
         }
-        this.transport.flush(this.coll);
+        this.transport.flush(coll);
     }
 
 }
