@@ -12,6 +12,7 @@ export interface ICacheOpts {
     persistance?: ITransport
     store?: IStore
     doNotWaitSave?: boolean
+    trackRef?: boolean
 }
 export interface ICacheChangeEventMonitor {
     on (event: 'change', fn: Function)
@@ -27,6 +28,9 @@ export interface ICacheEntryCollection<T = any> {
 }
 
 export class Cache <T = any> {
+
+    static caches: Cache[]
+
     private _cache: ICacheEntryCollection<T> = {};
 
     /** We save/read ALL cached object to the backed store */
@@ -49,6 +53,9 @@ export class Cache <T = any> {
         if (this.options.store) {
             this._store = new StoreWorker(this.options.store, options);
             this.isAsync = this._store.isAsync;
+        }
+        if (options.trackRef) {
+            Cache.caches.push(this);
         }
     }
 

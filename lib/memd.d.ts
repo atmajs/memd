@@ -87,6 +87,7 @@ declare module 'memd/Cache' {
         persistance?: ITransport;
         store?: IStore;
         doNotWaitSave?: boolean;
+        trackRef?: boolean;
     }
     export interface ICacheChangeEventMonitor {
         on(event: 'change', fn: Function): any;
@@ -101,6 +102,7 @@ declare module 'memd/Cache' {
     }
     export class Cache<T = any> {
         options: ICacheOpts;
+        static caches: Cache[];
         isAsync: boolean;
         constructor(options?: ICacheOpts);
         resolveKey(...args: any[]): string;

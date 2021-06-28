@@ -1,7 +1,7 @@
 <h1><code>Mem</code><tt>d</tt></h1>
 ----
 
-[![Build Status](https://travis-ci.org/atmajs/memd.png?branch=master)](https://travis-ci.org/tenbits/memd)
+[![Build Status](https://travis-ci.com/atmajs/memd.png?branch=master)](https://travis-ci.com/atmajs/memd)
 [![NPM version](https://badge.fury.io/js/memd.svg)](http://badge.fury.io/js/memd)
 
 * Memoize, debounce, throttle and queue methods
