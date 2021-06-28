@@ -29,7 +29,7 @@ export interface ICacheEntryCollection<T = any> {
 
 export class Cache <T = any> {
 
-    static caches: Cache[]
+    static caches: Cache[] = []
 
     private _cache: ICacheEntryCollection<T> = {};
 
