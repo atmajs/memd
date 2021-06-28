@@ -7,6 +7,9 @@ export class TransportWorker {
 
     private lastModified: Date = null;
     private restorePromise: Promise<any> = null;
+
+    // We duplicate collection, as Cache collections can store also promises.
+    private coll: ICacheEntryCollection = {}
     private flushRunner: AsyncRunner;
 
     constructor (private cache: Cache, private transport: ITransport) {
@@ -47,14 +50,25 @@ export class TransportWorker {
     flush (key: string, entry: ICacheEntry) {
         this.isReady = true;
         this.lastModified = new Date();
+        this.coll[key] = entry;
 
         if (this.transport.debounceMs === 0) {
-            this.transport.flush(this.cache.getCollection());
+            this.transport.flush(this.coll);
             return;
         }
         this.flushRunner.run();
     }
-    async flushAsync (force?: boolean) {
+
+    async flushAsync (key: string, entry: ICacheEntry, force?: boolean) {
+        if (this.isReady === false) {
+            await this.restoreAsync();
+        }
+
+        this.lastModified = new Date();
+        this.coll[key] = entry;
+        return this.flushRunner.run();
+    }
+    async flushAllAsync (force?: boolean) {
         if (this.isReady === false) {
             await this.restoreAsync();
         }
@@ -69,12 +83,8 @@ export class TransportWorker {
         return this.clear();
     }
 
-    getCollection () {
-        return this.cache.getCollection();
-    }
-
     private flushInner () {
-        let coll = this.cache.getCollection();
+        let coll = this.coll;
         if (this.transport.isAsync) {
             return this.transport.flushAsync(coll);
         }

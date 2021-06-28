@@ -131,7 +131,7 @@ export class Cache <T = any> {
             };
         }
         if (isAsync) {
-            await this._transport?.flushAsync();
+            await this._transport?.flushAsync(key, entry);
             await this._store?.saveAsync(key, entry);
         } else {
             this._transport?.flush(key, entry);
@@ -187,7 +187,7 @@ export class Cache <T = any> {
     }
 
     async flushAsync (force?: boolean) {
-        await this._transport?.flushAsync(force);
+        await this._transport?.flushAllAsync(force);
     }
 
     static async flushAllAsync () {
