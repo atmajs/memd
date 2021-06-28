@@ -26,6 +26,7 @@ export class TransportWorker {
         }
         let coll = this.transport.restore();
         this.cache.setRestored(coll);
+        this.coll = coll ?? {};
         this.isReady = true;
     }
 
@@ -43,6 +44,7 @@ export class TransportWorker {
                 return;
             }
             this.cache.setRestored(coll);
+            this.coll = coll ?? {};
             this.isReady = true;
         })());
     }
@@ -85,6 +87,7 @@ export class TransportWorker {
 
     private flushInner () {
         let coll = this.coll;
+        console.log('FlushInner', this.coll);
         if (this.transport.isAsync) {
             return this.transport.flushAsync(coll);
         }

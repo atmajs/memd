@@ -87,7 +87,9 @@ export class Cache <T = any> {
     async getAsync (key: string, ...args): Promise<T> {
         if (this._transport != null && this._transport.isReady === false) {
             await this._transport.restoreAsync();
+            console.log('RESTORED,', this._cache, 'get', key);
         }
+
         let entry = this._cache[key];
         if (entry == null) {
             if (this._store == null) {
@@ -153,9 +155,6 @@ export class Cache <T = any> {
             ...(coll ?? {}),
             ...(this._cache ?? {}),
         };
-    }
-    getCollection () {
-        return this._cache;
     }
 
     clear (key?: string) {

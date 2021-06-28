@@ -79,4 +79,30 @@ UTest({
         has_(data, String(rand2));
         has_(data, String(rand3));
     },
+    async '!fs writes, then read and write' () {
+        let cache = new Cache({
+            persistance: new FsTransport({ path: path })
+        });
+
+        let rand1 = (Math.random() * 10 ** 5) | 0;
+        await cache.setAsync(`foo`, Promise.resolve(rand1));
+        await cache.flushAsync();
+
+        let cache2 = new Cache({
+            persistance: new FsTransport({ path: path })
+        });
+
+
+        let fooVal = await cache2.getAsync(`foo`);
+        eq_(fooVal, rand1);
+
+        let rand2 = (Math.random() * 10 ** 5) | 0;
+        await cache2.setAsync(`bar`, Promise.resolve(rand2));
+
+        await cache2.flushAsync();
+        let data = await File.readAsync <string> (path, { skipHooks: true, cached: false });
+
+        has_(data, String(rand1));
+        has_(data, String(rand2));
+    },
 })
