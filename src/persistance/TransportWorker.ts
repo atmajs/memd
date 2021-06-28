@@ -87,7 +87,6 @@ export class TransportWorker {
 
     private flushInner () {
         let coll = this.coll;
-        console.log('FlushInner', this.coll);
         if (this.transport.isAsync) {
             return this.transport.flushAsync(coll);
         }

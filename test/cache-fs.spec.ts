@@ -79,7 +79,7 @@ UTest({
         has_(data, String(rand2));
         has_(data, String(rand3));
     },
-    async '!fs writes, then read and write' () {
+    async 'fs writes, then read and write' () {
         let cache = new Cache({
             persistance: new FsTransport({ path: path })
         });
