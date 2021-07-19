@@ -1,7 +1,7 @@
 import { class_EventEmitter } from 'atma-utils'
 import { deco_memoize } from '../src/deco/memoize';
-import sinon = require('sinon');
 import { fn_memoize } from '../src/fn/memoize';
+import * as sinon from 'sinon';
 
 UTest({
     'memoize'() {
@@ -155,6 +155,47 @@ UTest({
         let result3 = await promise3;
         eq_(result3, 3);
     },
+
+    'memoize on properties': {
+        'for all instances' () {
+            class Foo {
+                @deco_memoize()
+                get getFoo () {
+                    return { t: Math.random() };
+                }
+            }
+            let foo = new Foo ();
+            let v1 = foo.getFoo;
+            let v2 = foo.getFoo;
+            eq_(typeof v1.t, 'number');
+            eq_(v1.t, v2.t);
+
+            let foo2 = new Foo()
+            let v21 = foo2.getFoo;
+            eq_(v1.t, v21.t);
+        },
+        'per instance' () {
+            class Foo {
+                @deco_memoize({ perInstance: true })
+                get getFoo () {
+                    return { t: Math.random() };
+                }
+            }
+            let foo = new Foo ();
+            let v1 = foo.getFoo;
+            let v2 = foo.getFoo;
+            eq_(typeof v1.t, 'number');
+            eq_(v1.t, v2.t);
+
+            let foo2 = new Foo()
+            let v21 = foo2.getFoo;
+            let v22 = foo2.getFoo;
+            eq_(typeof v21.t, 'number');
+            eq_(v21.t, v22.t);
+
+            notEq_(v1.t, v21.t);
+        }
+    }
 })
 
 async function wait(ms) {

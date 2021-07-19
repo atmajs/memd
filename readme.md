@@ -15,7 +15,10 @@ import { deco } from 'memd';
 
 class Foo {
     @deco.memoize()
-    foo () {}
+    someMethod () {}
+
+    @deco.memoize()
+    get someProp () {}
 
     @deco.debounce()
     bar () {}
@@ -57,7 +60,12 @@ const cache = new Cache(<ICacheOpts> { maxAge: 60 });
 
 ```ts
 interface IMemoizeOpts {
+    // Per default method or getter returns are cached for all instances of a class.
+    // Use `perInstance` to cache per instance: this could be useful when the method reads `this.` values.
     perInstance?: boolean
+
+    // When a promise is memoized, and gets rejected. Clear also the cache, so that
+    // the next time it wont hit the cache and is reavaluated.
     clearOnReject?: boolean
 }
 .memoize(opts?: ICacheOpts & IMemoizeOpts)
