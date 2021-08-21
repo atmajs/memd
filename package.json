@@ -24,10 +24,13 @@
     },
     "scripts": {
         "test": "atma test",
-        "build": "app-bundler && npm run build-dts",
+        "build": "npm run build-bundle && npm run build-dts && npm run build-typedoc",
+        "build-bundle": "app-bundler",
+        "build-dts": "tsc -p tsconfig-build.json && atma run tools/build-dts",
+        "build-typedoc": "typedoc --tsconfig ./tsconfig-typedoc.json && atma task copy",
+
         "watch": "app-bundler --watch",
         "server": "atma server",
-        "build-dts": "tsc -p tsconfig-build.json && atma custom tools/build-dts",
         "release": "echo \"Run atma pub -m \"message\"\""
     },
     "license": "MIT",
@@ -81,6 +84,16 @@
                     }
                 }
             }
+        },
+        "tasks": {
+            "copy": {
+                "files": {
+                    "./assets/background.jpg": "./docs/assets/background.jpg"
+                }
+            }
         }
+    },
+    "dependencies": {
+        "typedoc": "^0.21.6"
     }
 }

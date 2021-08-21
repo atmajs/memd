@@ -1,15 +1,20 @@
-<h1><code>Mem</code><tt>d</tt></h1>
+# Memd
+
+<p align='center'>
+    <img src='assets/background.jpg'/>
+</p>
+
 ----
 
 [![Build Status](https://travis-ci.com/atmajs/memd.png?branch=master)](https://travis-ci.com/atmajs/memd)
 [![NPM version](https://badge.fury.io/js/memd.svg)](http://badge.fury.io/js/memd)
 
 * Memoize, debounce, throttle and queue methods
-* Object Cache
-* Persistance: (File, LocalStorage, Custom)
+* Cache Handler
+* Persistence: (File, LocalStorage, Custom)
 * NodeJS/Browser
 
-```typescript
+```ts
 
 import { deco } from 'memd';
 

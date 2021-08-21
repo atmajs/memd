@@ -23,7 +23,7 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
     const Wrapper: IMemoizeWrapper & T = <any> function (...args) {
         let cache = _cache;
         if (_perInstance === true) {
-            let prop = `__$mem_${key}`;
+            const prop = `__$mem_${key}`;
             cache = this[prop];
             if (cache == null) {
                 cache = new Cache(opts);
