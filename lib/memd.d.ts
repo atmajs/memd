@@ -71,6 +71,7 @@ declare module 'memd/fn/memoize' {
         clearOnReady?: boolean;
         clearOnReject?: boolean;
         clearOn?: (val: any) => boolean;
+        thisArg?: any;
     }
     export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper & T;
     export function fn_clearMemoized(fn: Function, ...args: any[]): void;
@@ -116,6 +117,7 @@ declare module 'memd/Cache' {
         destroy(): void;
         flushAsync(force?: boolean): Promise<void>;
         static flushAllAsync(): Promise<void>;
+        static resolve<T>(cache: Cache<T>, resolver: () => Promise<T>, key?: string): Promise<T>;
     }
 }
 

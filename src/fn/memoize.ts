@@ -6,6 +6,7 @@ export interface IMemoizeOpts {
     clearOnReady?: boolean
     clearOnReject?: boolean
     clearOn?: (val) => boolean
+    thisArg?: any
 }
 
 export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper & T {
@@ -20,6 +21,8 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
     let _clearOnReject = opts?.clearOnReject ?? false;
     let _clearOn = opts?.clearOn ?? null;
     let _caches = [] as Cache[];
+    let _thisArg = opts?.thisArg;
+
     const Wrapper: IMemoizeWrapper & T = <any> function (...args) {
         let cache = _cache;
         if (_perInstance === true) {
@@ -40,7 +43,7 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
             return cached;
         }
         let isPromise = null as boolean;
-        let val = fn.apply(this, args);
+        let val = fn.apply(_thisArg ?? this, args);
         if (_clearOnReject === true) {
             isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
             if (isPromise) {
@@ -99,6 +102,7 @@ function fn_memoizeAsync<T extends Function>(_cache: Cache, fn:T, opts: ICacheOp
     let _clearOnReject = opts?.clearOnReject ?? false;
     let _clearOn = opts?.clearOn ?? null;
     let _caches = [] as Cache[];
+    let _thisArg = opts?.thisArg;
 
     const Wrapper: IMemoizeWrapper & T = <any> async function (...args) {
         let cache = _cache;
@@ -120,7 +124,7 @@ function fn_memoizeAsync<T extends Function>(_cache: Cache, fn:T, opts: ICacheOp
             return cached;
         }
         let isPromise = null as boolean;
-        let val = fn.apply(this, args);
+        let val = fn.apply(_thisArg ?? this, args);
         if (_clearOnReject === true) {
             isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
             if (isPromise) {

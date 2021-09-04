@@ -1,13 +1,14 @@
 {
     "name": "memd",
-    "description": "Cache data and also memoize, debounce, throttle and queue methods",
+    "description": "Cache data and memoize, debounce, throttle and queue methods",
     "author": {
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.3.5",
+    "version": "0.3.6",
     "main": "./lib/memd.js",
     "types": "./lib/memd.d.ts",
+    "keywords": ["memoize", "cache", "debounce", "throttle"],
     "repository": {
         "type": "git",
         "url": "git://github.com/atmajs/memd.git"

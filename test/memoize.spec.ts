@@ -2,6 +2,7 @@ import { class_EventEmitter } from 'atma-utils'
 import { deco_memoize } from '../src/deco/memoize';
 import { fn_memoize } from '../src/fn/memoize';
 import * as sinon from 'sinon';
+import * as Sinon from 'sinon';
 
 UTest({
     'memoize'() {
@@ -195,6 +196,25 @@ UTest({
 
             notEq_(v1.t, v21.t);
         }
+    },
+    'should set this argument for memoized function' () {
+        const spied = Sinon.spy(function () {
+            return this?.foo;
+        });
+        const foo = {
+            foo: 'ifoo',
+            getFoo: spied
+        };
+        const getFooMemoized = fn_memoize(foo.getFoo, {
+            thisArg: foo
+        });
+
+        eq_(getFooMemoized(), 'ifoo');
+        eq_(getFooMemoized(), 'ifoo');
+        eq_(spied.callCount, 1);
+
+        const getFooMemoizedWrong = fn_memoize(foo.getFoo);
+        eq_(getFooMemoizedWrong(), null);
     }
 })
 

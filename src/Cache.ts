@@ -191,4 +191,22 @@ export class Cache <T = any> {
     static async flushAllAsync () {
         await Promise.all(Cache.caches.map(cache => cache.flushAsync(true)));
     }
+
+    static async resolve <T> (cache: Cache<T>, resolver: () => Promise<T>, key = ''): Promise<T> {
+        let value = await cache.getAsync(key);
+        if (value != null) {
+            return value;
+        }
+        let promise = resolver();
+        cache.set(key, <any> promise);
+
+        try {
+            value = await promise;
+        } catch (error) {
+            cache.clear(key);
+            throw error;
+        }
+        await cache.flushAsync();
+        return value;
+    }
 }
