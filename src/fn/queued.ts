@@ -2,16 +2,18 @@ import { Deferred } from '../model/Deferred';
 
 interface IQueueOpts {
 
-    /** When fn is active all further calls will receive active promise */
+    /** When the fn is active all further calls will receive active promise */
     single?: boolean
 
-    /** When fn is called and the queue already has waiters - remove them */
+    /** When the fn is called and the queue has already waiters - remove them */
     trimQueue?: boolean
     timeout?: number
 
-    /** method call frequence */
+    /** the fn call frequence */
     throttle?: number
 }
+
+/** For original async method - ensure it is called one after another  */
 export function fn_queued<T extends Function>(fn: T, opts: IQueueOpts = {}): T {
 
     let queue = [] as ReturnType<typeof Queued['prepair']>[];

@@ -10,6 +10,7 @@ UTest({
     },
     $teardown () {
         File.exists(path) && File.remove(path);
+        File.clearCache();
     },
     async 'fs cache' () {
         let cache = new Cache({

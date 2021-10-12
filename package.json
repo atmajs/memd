@@ -5,7 +5,7 @@
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.3.6",
+    "version": "0.3.7",
     "main": "./lib/memd.js",
     "types": "./lib/memd.d.ts",
     "keywords": ["memoize", "cache", "debounce", "throttle"],
@@ -21,7 +21,8 @@
         "atma-io": "^1.2.39",
         "atma-loader-ts": "^1.1.11",
         "atma-utils": "^0.2.49",
-        "dts-bundle": "^0.7.3"
+        "dts-bundle": "^0.7.3",
+        "typedoc": "^0.21.6"
     },
     "scripts": {
         "test": "atma test",
@@ -93,8 +94,5 @@
                 }
             }
         }
-    },
-    "dependencies": {
-        "typedoc": "^0.21.6"
     }
 }

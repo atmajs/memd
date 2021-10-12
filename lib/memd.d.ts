@@ -47,12 +47,20 @@ declare module 'memd/deco/debounce' {
 }
 
 declare module 'memd/deco/throttle' {
+    interface IThrottleOptions {
+            /** Regarding the 1 fn call. The fn will be called at the end of the throttle frame */
+            shouldCallLater?: boolean;
+            /** Use arguments as throttled key */
+            perArguments?: boolean;
+    }
     /**
-      * Calls function maximal each time window frame
-      * @param timeWindow how often, in ms, should the function be called
-      * @param shouldCallLater start calling fn on frame start
-      */
-    export function deco_throttle(timeWindow: number, shouldCallLater?: boolean): (target: any, propertyKey: any, descriptor?: any) => any;
+        * Calls function maximal each time window frame
+        * @param timeWindow how often, in ms, should the function be called
+        * @param shouldCallLater start calling fn on frame start
+        */
+    export function deco_throttle(timeWindow: number, shouldCallLater?: boolean): any;
+    export function deco_throttle(timeWindow: number, options?: IThrottleOptions): any;
+    export {};
 }
 
 declare module 'memd/deco/queued' {
@@ -170,14 +178,15 @@ declare module 'memd/workers/CachedWorker' {
 
 declare module 'memd/fn/queued' {
     interface IQueueOpts {
-        /** When fn is active all further calls will receive active promise */
+        /** When the fn is active all further calls will receive active promise */
         single?: boolean;
-        /** When fn is called and the queue already has waiters - remove them */
+        /** When the fn is called and the queue has already waiters - remove them */
         trimQueue?: boolean;
         timeout?: number;
-        /** method call frequence */
+        /** the fn call frequence */
         throttle?: number;
     }
+    /** For original async method - ensure it is called one after another  */
     export function fn_queued<T extends Function>(fn: T, opts?: IQueueOpts): T;
     export {};
 }
