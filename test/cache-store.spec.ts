@@ -1,5 +1,4 @@
-import Sinon = require('sinon');
-import { Cache } from '../src/Cache'
+import * as Sinon from 'sinon';
 import { deco_memoize } from '../src/deco/memoize';
 import { IStore } from '../src/persistance/IStore'
 

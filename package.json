@@ -5,7 +5,7 @@
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.3.8",
+    "version": "0.3.9",
     "main": "./lib/memd.js",
     "types": "./lib/memd.d.ts",
     "keywords": [

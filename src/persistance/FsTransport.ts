@@ -23,8 +23,10 @@ export class FsTransport implements ITransport {
 
     async restoreAsync () {
         try {
-            let str = await this._file.readAsync();
-            return JSON.parse(str);
+            let json = await this._file.readAsync();
+            return typeof json === 'string'
+                ? JSON.parse(json)
+                : json;
         } catch (error) {
             return {};
         }

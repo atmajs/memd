@@ -2,7 +2,6 @@ import { class_EventEmitter } from 'atma-utils'
 import { deco_memoize } from '../src/deco/memoize';
 import { fn_memoize } from '../src/fn/memoize';
 import * as sinon from 'sinon';
-import * as Sinon from 'sinon';
 
 UTest({
     'memoize'() {
@@ -198,7 +197,7 @@ UTest({
         }
     },
     'should set this argument for memoized function' () {
-        const spied = Sinon.spy(function () {
+        const spied = sinon.spy(function () {
             return this?.foo;
         });
         const foo = {
