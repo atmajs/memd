@@ -1,7 +1,7 @@
 import { ICacheOpts } from '../Cache';
 import { fn_memoize, IMemoizeOpts } from '../fn/memoize';
 
-export function deco_memoize (opts?: ICacheOpts & IMemoizeOpts) {
+export function deco_memoize <TMethod extends (...args) => any, TThis = any> (opts?: ICacheOpts & IMemoizeOpts<TMethod, TThis>) {
 
     return function (target, propertyKey, descriptor?) {
         const viaProperty = descriptor == null;

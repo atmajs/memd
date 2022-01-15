@@ -1,15 +1,31 @@
 import { IMemoizeWrapper } from '../model/IMemoizeWrapper';
 import { Cache, ICacheOpts } from '../Cache'
+import { Methods } from '../utils/types';
 
-export interface IMemoizeOpts {
+export interface IMemoizeOpts<TMethod extends (...args) => any = any, TThis = any> {
+    /** Default: false - we cache result for the prototyped method, means the cache is for all instances. Set this to "true", to make the cache for each entity */
     perInstance?: boolean
+
+    /** Default: false - cache is active only during the promise is in progress */
     clearOnReady?: boolean
+
+    /** Default: false - remove cached result if promise is rejected */
     clearOnReject?: boolean
+
+    /** Method to check if cached result, should be removed from cache */
     clearOn?: (val) => boolean
-    thisArg?: any
+
+    thisArg?: TThis
+
+    /** Override key resolver*/
+    key?: (options: { this?: TThis }, ...args: Parameters<TMethod>) => string
 }
 
-export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoizeOpts = {}, key?: string): IMemoizeWrapper & T {
+export function fn_memoize<TMethod extends (...args) => any, TThis = any>(
+    fn:TMethod,
+    opts: ICacheOpts & IMemoizeOpts<TMethod, TThis> = {},
+    key?: string
+): IMemoizeWrapper & TMethod {
 
     let _cache = new Cache(opts);
     if (_cache.isAsync) {
@@ -23,7 +39,7 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
     let _caches = [] as Cache[];
     let _thisArg = opts?.thisArg;
 
-    const Wrapper: IMemoizeWrapper & T = <any> function (...args) {
+    const Wrapper: IMemoizeWrapper & TMethod = <any> function (...args: Parameters<TMethod>) {
         let cache = _cache;
         if (_perInstance === true) {
             const prop = `__$mem_${key}`;
@@ -37,13 +53,14 @@ export function fn_memoize<T extends Function>(fn:T, opts: ICacheOpts & IMemoize
                 _caches.push(cache);
             }
         }
-        const id = cache.resolveKey(...args);
+        const thisArg = _thisArg ?? this;
+        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(...args);
         const cached = cache.get(id);
         if (cached != null) {
             return cached;
         }
         let isPromise = null as boolean;
-        let val = fn.apply(_thisArg ?? this, args);
+        let val = fn.apply(thisArg, args);
         if (_clearOnReject === true) {
             isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
             if (isPromise) {
@@ -118,13 +135,14 @@ function fn_memoizeAsync<T extends Function>(_cache: Cache, fn:T, opts: ICacheOp
                 _caches.push(cache);
             }
         }
-        const id = cache.resolveKey(...args);
+        const thisArg = _thisArg ?? this;
+        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(...args);
         const cached = await cache.getAsync(id, ...args);
         if (cached != null) {
             return cached;
         }
         let isPromise = null as boolean;
-        let val = fn.apply(_thisArg ?? this, args);
+        let val = fn.apply(thisArg, args);
         if (_clearOnReject === true) {
             isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
             if (isPromise) {
@@ -183,3 +201,4 @@ export function fn_clearMemoized (fn: Function, ...args: any[]) {
     (fn as any)?.clearArgs?.(...args);
     return;
 }
+

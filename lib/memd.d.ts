@@ -35,7 +35,7 @@ declare module 'memd' {
 declare module 'memd/deco/memoize' {
     import { ICacheOpts } from 'memd/Cache';
     import { IMemoizeOpts } from 'memd/fn/memoize';
-    export function deco_memoize(opts?: ICacheOpts & IMemoizeOpts): (target: any, propertyKey: any, descriptor?: any) => any;
+    export function deco_memoize<TMethod extends (...args: any[]) => any, TThis = any>(opts?: ICacheOpts & IMemoizeOpts<TMethod, TThis>): (target: any, propertyKey: any, descriptor?: any) => any;
 }
 
 declare module 'memd/deco/debounce' {
@@ -74,14 +74,22 @@ declare module 'memd/deco/queued' {
 declare module 'memd/fn/memoize' {
     import { IMemoizeWrapper } from 'memd/model/IMemoizeWrapper';
     import { ICacheOpts } from 'memd/Cache';
-    export interface IMemoizeOpts {
+    export interface IMemoizeOpts<TMethod extends (...args: any[]) => any = any, TThis = any> {
+        /** Default: false - we cache result for the prototyped method, means the cache is for all instances. Set this to "true", to make the cache for each entity */
         perInstance?: boolean;
+        /** Default: false - cache is active only during the promise is in progress */
         clearOnReady?: boolean;
+        /** Default: false - remove cached result if promise is rejected */
         clearOnReject?: boolean;
+        /** Method to check if cached result, should be removed from cache */
         clearOn?: (val: any) => boolean;
-        thisArg?: any;
+        thisArg?: TThis;
+        /** Override key resolver*/
+        key?: (options: {
+            this?: TThis;
+        }, ...args: Parameters<TMethod>) => string;
     }
-    export function fn_memoize<T extends Function>(fn: T, opts?: ICacheOpts & IMemoizeOpts, key?: string): IMemoizeWrapper & T;
+    export function fn_memoize<TMethod extends (...args: any[]) => any, TThis = any>(fn: TMethod, opts?: ICacheOpts & IMemoizeOpts<TMethod, TThis>, key?: string): IMemoizeWrapper & TMethod;
     export function fn_clearMemoized(fn: Function, ...args: any[]): void;
 }
 

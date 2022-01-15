@@ -5,10 +5,15 @@
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.3.7",
+    "version": "0.3.8",
     "main": "./lib/memd.js",
     "types": "./lib/memd.d.ts",
-    "keywords": ["memoize", "cache", "debounce", "throttle"],
+    "keywords": [
+        "memoize",
+        "cache",
+        "debounce",
+        "throttle"
+    ],
     "repository": {
         "type": "git",
         "url": "git://github.com/atmajs/memd.git"
@@ -19,7 +24,7 @@
         "app-bundler": "0.0.83",
         "atma": "^0.12.18",
         "atma-io": "^1.2.39",
-        "atma-loader-ts": "^1.1.11",
+        "atma-loader-ts": "^1.1.16",
         "atma-utils": "^0.2.49",
         "dts-bundle": "^0.7.3",
         "typedoc": "^0.21.6"
@@ -30,7 +35,6 @@
         "build-bundle": "app-bundler",
         "build-dts": "tsc -p tsconfig-build.json && atma run tools/build-dts",
         "build-typedoc": "typedoc --tsconfig ./tsconfig-typedoc.json && atma task copy",
-
         "watch": "app-bundler --watch",
         "server": "atma server",
         "release": "echo \"Run atma pub -m \"message\"\""

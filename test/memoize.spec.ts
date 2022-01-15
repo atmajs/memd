@@ -215,7 +215,47 @@ UTest({
 
         const getFooMemoizedWrong = fn_memoize(foo.getFoo);
         eq_(getFooMemoizedWrong(), null);
-    }
+    },
+    'can define custom toKey method' () {
+
+        function getFoo (val: { id: string, rnd: number }) {
+            return Math.random();
+        };
+        const getFooMemoized = fn_memoize(getFoo, {
+            key (opts, val) {
+                return val.id;
+            }
+        });
+
+        let r1 = getFooMemoized({ id: '1', rnd: Math.random() });
+        let r2 = getFooMemoized({ id: '1', rnd: Math.random() });
+        eq_(r1, r2);
+
+        let r3 = getFooMemoized({ id: '2', rnd: Math.random() });
+        notEq_(r1, r3);
+    },
+    'can define custom toKey method via Decorator' () {
+
+        class Foo {
+            @deco_memoize<Foo['getFoo']>({
+                key (opts, val) {
+                    return val.id;
+                }
+            })
+            getFoo (val: { id: string, rnd: number }) {
+                return Math.random();
+            }
+        }
+
+        const foo = new Foo();
+
+        let r1 = foo.getFoo({ id: '1', rnd: Math.random() });
+        let r2 = foo.getFoo({ id: '1', rnd: Math.random() });
+        eq_(r1, r2);
+
+        let r3 = foo.getFoo({ id: '2', rnd: Math.random() });
+        notEq_(r1, r3);
+    },
 })
 
 async function wait(ms) {
