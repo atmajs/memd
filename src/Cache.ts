@@ -125,7 +125,12 @@ export class Cache <T = any> {
         let val = entry.value;
         let isPromise = val != null && typeof val === 'object' && typeof val.then === 'function';
         if (isPromise) {
-            val = await val;
+            try {
+                val = await val;
+            } catch (error) {
+                // do nothing on rejection
+                return;
+            }
             entry = {
                 value: val,
                 timestamp: entry.timestamp,
