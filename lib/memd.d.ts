@@ -142,13 +142,16 @@ declare module 'memd/persistance/FsTransport' {
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface IFsTransportOpts {
         path: string;
+        browser?: {
+            localStorage?: boolean;
+        };
     }
     export class FsTransport implements ITransport {
         opts: IFsTransportOpts;
         isAsync: boolean;
         constructor(opts: IFsTransportOpts);
         restoreAsync(): Promise<any>;
-        flushAsync(coll: ICacheEntryCollection): Promise<any>;
+        flushAsync(coll: ICacheEntryCollection): Promise<void>;
     }
 }
 
