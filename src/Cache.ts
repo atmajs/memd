@@ -59,9 +59,9 @@ export class Cache <T = any> {
         }
     }
 
-    resolveKey (...args) {
+    resolveKey (args: any[], keyOptions) {
         let key = this.options?.keyResolver?.(...args);
-        return key ?? Args.getKey(args);
+        return key ?? Args.getKey(args, keyOptions);
     }
 
     get (key: string, ...args): T {

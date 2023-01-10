@@ -19,6 +19,13 @@ export interface IMemoizeOpts<TMethod extends (...args) => any = any, TThis = an
 
     /** Override key resolver*/
     key?: (options: { this?: TThis }, ...args: Parameters<TMethod>) => string
+
+    keyOptions?: {
+        deep?: number
+        serialize?: {
+            [selector: string]: (val: any) => string
+        }
+    }
 }
 
 export function fn_memoize<TMethod extends (...args) => any, TThis = any>(
@@ -54,7 +61,7 @@ export function fn_memoize<TMethod extends (...args) => any, TThis = any>(
             }
         }
         const thisArg = _thisArg ?? this;
-        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(...args);
+        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(args, opts?.keyOptions);
         const cached = cache.get(id);
         if (cached != null) {
             return cached;
@@ -100,7 +107,7 @@ export function fn_memoize<TMethod extends (...args) => any, TThis = any>(
         return cache.set(id, val);
     };
     Wrapper.clearArgs = function (...args) {
-        const id = _cache.resolveKey(...args);
+        const id = _cache.resolveKey(args);
         _cache.clear(id);
         _caches.forEach(x => x.clear(id));
     };
@@ -136,7 +143,7 @@ function fn_memoizeAsync<T extends Function>(_cache: Cache, fn:T, opts: ICacheOp
             }
         }
         const thisArg = _thisArg ?? this;
-        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(...args);
+        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(args, opts?.keyOptions);
         const cached = await cache.getAsync(id, ...args);
         if (cached != null) {
             return cached;
@@ -182,7 +189,7 @@ function fn_memoizeAsync<T extends Function>(_cache: Cache, fn:T, opts: ICacheOp
         return cache.setAsync(id, val);
     };
     Wrapper.clearArgs = function (...args) {
-        const id = _cache.resolveKey(...args);
+        const id = _cache.resolveKey(args);
         _cache.clearAsync(id);
         _caches.forEach(x => x.clearAsync(id));
     };
