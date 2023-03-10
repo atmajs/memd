@@ -1,5 +1,6 @@
 import { ITransport } from './ITransport';
 import { ICacheEntryCollection } from '../Cache';
+import type { FileSafe } from 'atma-io';
 
 export interface IFsTransportOpts {
     path: string
@@ -22,12 +23,18 @@ export class FsTransport implements ITransport {
             }
             return;
         }
-        /** lazy load require and preventing bundler's build */
-        const r = require;
-        const module = 'atma-io';
-        const FileSafe = r(module).FileSafe;
+        const { path } = this.opts;
+        if (path in CACHED_STORAGES) {
+            this._file = CACHED_STORAGES[path];
+        } else {
+            /** lazy load require and preventing bundler's build */
+            const r = require;
+            const module = 'atma-io';
+            const FileSafe = r(module).FileSafe;
 
-        this._file = new FileSafe(this.opts.path, { threadSafe: true });
+            this._file = new FileSafe(this.opts.path, { threadSafe: true });
+            CACHED_STORAGES[path] = this._file;
+        }
     }
 
     async restoreAsync () {
@@ -69,4 +76,8 @@ class LocalStorageFile implements IStorage {
     async writeAsync(content: string): Promise<void> {
         localStorage.setItem(this.key, content);
     }
+}
+
+const CACHED_STORAGES = {} as {
+    [ path: string ]: IStorage
 }
