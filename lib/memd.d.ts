@@ -88,6 +88,12 @@ declare module 'memd/fn/memoize' {
         key?: (options: {
             this?: TThis;
         }, ...args: Parameters<TMethod>) => string;
+        keyOptions?: {
+            deep?: number;
+            serialize?: {
+                [selector: string]: (val: any) => string;
+            };
+        };
     }
     export function fn_memoize<TMethod extends (...args: any[]) => any, TThis = any>(fn: TMethod, opts?: ICacheOpts & IMemoizeOpts<TMethod, TThis>, key?: string): IMemoizeWrapper & TMethod;
     export function fn_clearMemoized(fn: Function, ...args: any[]): void;
@@ -122,7 +128,7 @@ declare module 'memd/Cache' {
         static caches: Cache[];
         isAsync: boolean;
         constructor(options?: ICacheOpts);
-        resolveKey(...args: any[]): string;
+        resolveKey(args: any[], keyOptions?: any): string;
         get(key: string, ...args: any[]): T;
         getAsync(key: string, ...args: any[]): Promise<T>;
         set(key: string, val: T): T;

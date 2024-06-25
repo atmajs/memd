@@ -5,9 +5,15 @@
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.3.13",
-    "main": "./lib/memd.js",
+    "version": "0.3.14",
+    "main": "./lib/umd/memd.js",
     "types": "./lib/memd.d.ts",
+    "exports": {
+        ".": {
+            "import": "./lib/esm/memd.mjs",
+            "require": "./lib/umd/memd.js"
+        }
+    },
     "keywords": [
         "memoize",
         "cache",
@@ -21,13 +27,14 @@
     "devDependencies": {
         "@types/node": "^12.12.6",
         "@types/sinon": "^2.3.3",
-        "app-bundler": "0.0.83",
-        "atma": "^0.12.18",
-        "atma-io": "^1.2.39",
-        "atma-loader-ts": "^1.1.16",
-        "atma-utils": "^0.2.49",
+        "app-bundler": "^0.2.6",
+        "atma": "^0.15.23",
+        "atma-io": "^1.2.73",
+        "atma-loader-ts": "^1.2.4",
+        "atma-utils": "^0.2.63",
         "dts-bundle": "^0.7.3",
-        "typedoc": "^0.21.6"
+        "typedoc": "^0.26.2",
+        "typescript": "^5.5.2"
     },
     "scripts": {
         "test": "atma test",
@@ -41,28 +48,54 @@
     },
     "license": "MIT",
     "app-bundler": {
-        "file": "src/export.ts",
-        "outputMain": "lib/memd.js",
-        "package": {
-            "module": "commonjs",
-            "moduleName": "memd",
-            "moduleWrapper": "umd",
-            "commonjs": {
-                "output": "simplified"
+        "apps": {
+            "umd": {
+                "outputMain": "lib/umd/memd.js",
+                "package": {
+                    "module": "commonjs",
+                    "moduleName": "memd",
+                    "moduleWrapper": "umd",
+                    "commonjs": {
+                        "output": "simplified"
+                    }
+                }
+            },
+            "esm": {
+                "outputMain": "lib/esm/memd.mjs",
+                "package": {
+                    "module": "commonjs",
+                    "moduleName": "memd",
+                    "moduleWrapper": "esm",
+                    "commonjs": {
+                        "output": "simplified"
+                    }
+                }
             }
         },
-        "extensions": {
-            "io": {
-                "type": "js"
+        "common": {
+            "file": "src/export.ts",
+            "extensions": {
+                "io": {
+                    "type": "js"
+                }
+            },
+            "defaultExtensions": {
+                "js": "ts"
+            },
+            "middlewares": {
+                "ts": [
+                    "atma-loader-ts:read"
+                ]
+            },
+            "settings": {
+                "atma-loader-ts": {
+                    "typescript": {
+                        "compilerOptions": {
+                            "module": "CommonJS"
+                        }
+                    }
+                }
             }
-        },
-        "defaultExtensions": {
-            "js": "ts"
-        },
-        "middlewares": {
-            "ts": [
-                "atma-loader-ts:read"
-            ]
         }
     },
     "atma": {
