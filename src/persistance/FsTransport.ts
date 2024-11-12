@@ -1,6 +1,7 @@
+import type { FileSafe } from 'atma-io';
 import { ITransport } from './ITransport';
 import { ICacheEntryCollection } from '../Cache';
-import type { FileSafe } from 'atma-io';
+import { requireLib } from '../utils/requireLib';
 
 export interface IFsTransportOpts {
     path: string
@@ -15,34 +16,18 @@ export class FsTransport implements ITransport {
     isAsync = true;
 
     constructor (public opts: IFsTransportOpts) {
-        let isNode = typeof process === 'undefined' || typeof process.exit !== 'function';
-        if (isNode) {
-            let useLocalStorage = opts?.browser?.localStorage;
-            if (useLocalStorage) {
-                this._file = new LocalStorageFile(this.opts.path);
-            }
-            return;
-        }
-        const { path } = this.opts;
-        if (path in CACHED_STORAGES) {
-            this._file = CACHED_STORAGES[path];
-        } else {
-            /** lazy load require and preventing bundler's build */
-            const r = require;
-            const module = 'atma-io';
-            const FileSafe = r(module).FileSafe;
 
-            this._file = new FileSafe(this.opts.path, { threadSafe: true });
-            CACHED_STORAGES[path] = this._file;
-        }
+
     }
 
     async restoreAsync () {
-        if (this._file == null) {
+        let file = await this.getFileSafeCtor()
+        if (file == null) {
             return;
         }
+
         try {
-            let json = await this._file.readAsync();
+            let json = await file.readAsync();
             return typeof json === 'string'
                 ? JSON.parse(json)
                 : json;
@@ -51,17 +36,42 @@ export class FsTransport implements ITransport {
         }
     }
     async flushAsync (coll: ICacheEntryCollection) {
-        if (this._file == null) {
+        let file = await this.getFileSafeCtor()
+        if (file == null) {
             return;
         }
         let json = JSON.stringify(coll);
-        return await this._file.writeAsync(json);
+        return await file.writeAsync(json);
+    }
+
+    private async getFileSafeCtor () {
+        let isBrowser = typeof process === 'undefined' || typeof process.exit !== 'function';
+        if (isBrowser) {
+            let useLocalStorage = this.opts?.browser?.localStorage;
+            if (useLocalStorage) {
+                this._file = new LocalStorageFile(this.opts.path);
+            }
+            return null;
+        }
+
+        const { path } = this.opts;
+        if (path in CACHED_STORAGES) {
+            this._file = CACHED_STORAGES[path];
+        } else {
+            /** lazy load require and preventing bundler's build */
+            const module = await requireLib.load<{ FileSafe: typeof FileSafe }>('atma-io');
+            const FileSafeCtor = module.FileSafe;
+
+            this._file = new FileSafeCtor(this.opts.path, { threadSafe: true });
+            CACHED_STORAGES[path] = this._file;
+        }
+        return this._file;
     }
 }
 
 interface IStorage {
     readAsync (): Promise<string>
-    writeAsync(content: string): Promise<void>
+    writeAsync(content: string): Promise<any>
 }
 
 class LocalStorageFile implements IStorage {
