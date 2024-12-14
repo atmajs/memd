@@ -1,6 +1,6 @@
 import * as Sinon from 'sinon';
 import { deco_memoize } from '../src/deco/memoize';
-import { IStore } from '../src/persistance/IStore'
+import { IStore } from '../src/persistence/IStore'
 
 UTest({
     async 'should memoize values async' () {

@@ -1,5 +1,5 @@
 import { Cache } from '../src/Cache'
-import { ITransport } from '../src/persistance/ITransport'
+import { ITransport } from '../src/persistence/ITransport'
 
 class Mem implements ITransport{
     mem = null
@@ -17,7 +17,7 @@ UTest({
     'should save values' () {
         let db = new Mem;
         let cache = new Cache({
-            persistance: db
+            persistence: db
         });
         cache.set('foo', 'bar');
         eq_(db.mem.foo.value, 'bar');
@@ -29,12 +29,12 @@ UTest({
             }
         });
         let cache = new Cache({
-            persistance: db
+            persistence: db
         });
         let val = cache.get('foo');
         eq_(val, 'baz');
 
-        '> should clear cache and persistance'
+        '> should clear cache and persistence'
         cache.clear();
         let val2 = cache.get('foo');
         eq_(val2, null);
@@ -51,14 +51,14 @@ UTest({
         });
 
         let cacheValid = new Cache({
-            persistance: db,
+            persistence: db,
             maxAge: ageMs / 1000 + 1
         });
         let val1 = cacheValid.get('foo');
         eq_(val1, 'baz', 'Not outdated');
 
         let cacheOutdated = new Cache({
-            persistance: db,
+            persistence: db,
             maxAge: ageMs / 1000 - 1
         });
         let val2 = cacheOutdated.get('foo');

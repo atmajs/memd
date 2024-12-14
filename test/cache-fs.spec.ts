@@ -1,5 +1,5 @@
 import { Cache } from '../src/Cache'
-import { FsTransport } from '../src/persistance/FsTransport'
+import { FsTransport } from '../src/persistence/FsTransport'
 import { File } from 'atma-io';
 
 
@@ -14,7 +14,7 @@ UTest({
     },
     async 'fs cache' () {
         let cache = new Cache({
-            persistance: new FsTransport({ path: path })
+            persistence: new FsTransport({ path: path })
         });
 
         let time = Date.now();
@@ -27,7 +27,7 @@ UTest({
     },
     async 'fs cache multi writes' () {
         let cache = new Cache({
-            persistance: new FsTransport({ path: path })
+            persistence: new FsTransport({ path: path })
         });
 
         let rand1 = (Math.random() * 10 ** 5) | 0;
@@ -53,7 +53,7 @@ UTest({
         };
         await File.writeAsync(path, model);
         let cache = new Cache({
-            persistance: new FsTransport({ path: path })
+            persistence: new FsTransport({ path: path })
         });
 
         let r1 = await cache.getAsync('foo');
@@ -61,7 +61,7 @@ UTest({
     },
     async 'fs cache multi writes async' () {
         let cache = new Cache({
-            persistance: new FsTransport({ path: path })
+            persistence: new FsTransport({ path: path })
         });
 
         let rand1 = (Math.random() * 10 ** 5) | 0;
@@ -82,7 +82,7 @@ UTest({
     },
     async 'fs writes, then read and write' () {
         let cache = new Cache({
-            persistance: new FsTransport({ path: path })
+            persistence: new FsTransport({ path: path })
         });
 
         let rand1 = (Math.random() * 10 ** 5) | 0;
@@ -90,7 +90,7 @@ UTest({
         await cache.flushAsync();
 
         let cache2 = new Cache({
-            persistance: new FsTransport({ path: path })
+            persistence: new FsTransport({ path: path })
         });
 
 

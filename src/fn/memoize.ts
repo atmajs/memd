@@ -17,8 +17,11 @@ export interface IMemoizeOpts<TMethod extends (...args) => any = any, TThis = an
 
     thisArg?: TThis
 
-    /** Override key resolver*/
+    /** Override key resolver */
     key?: (options: { this?: TThis }, ...args: Parameters<TMethod>) => string
+
+    /** Gets the prefix for a key, for example to distinguish keys per instances */
+    keyPfx?: (self: TThis) => string
 
     keyOptions?: {
         deep?: number
@@ -61,7 +64,7 @@ export function fn_memoize<TMethod extends (...args) => any, TThis = any>(
             }
         }
         const thisArg = _thisArg ?? this;
-        const id = opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(args, opts?.keyOptions);
+        const id = (opts?.keyPfx?.(thisArg) ?? '') + (opts?.key?.({ this: thisArg }, ...args) ?? cache.resolveKey(args, opts?.keyOptions));
         const cached = cache.get(id);
         if (cached != null) {
             return cached;

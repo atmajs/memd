@@ -4,8 +4,8 @@ import { deco_throttle } from './deco/throttle';
 import { deco_queued } from './deco/queued';
 import { fn_clearMemoized, fn_memoize } from './fn/memoize';
 import { Cache } from './Cache'
-import { FsTransport } from './persistance/FsTransport';
-import { LocalStorageTransport } from './persistance/LocalStorageTransport';
+import { FsTransport } from './persistence/FsTransport';
+import { LocalStorageTransport } from './persistence/LocalStorageTransport';
 import { CachedWorker } from './workers/CachedWorker';
 import { fn_queued } from './fn/queued';
 

@@ -5,7 +5,7 @@
         "name": "Alexander Kit",
         "email": "alex.kit@atmajs.com"
     },
-    "version": "0.3.15",
+    "version": "0.3.16",
     "main": "./lib/umd/memd.js",
     "types": "./lib/memd.d.ts",
     "exports": {

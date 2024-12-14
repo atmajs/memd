@@ -1,15 +1,15 @@
 import { Args } from './fn/Args';
-import { ITransport } from './persistance/ITransport';
-import { IStore } from "./persistance/IStore";
-import { TransportWorker } from './persistance/TransportWorker';
-import { StoreWorker } from './persistance/StoreWorker';
+import { ITransport } from './persistence/ITransport';
+import { IStore } from "./persistence/IStore";
+import { TransportWorker } from './persistence/TransportWorker';
+import { StoreWorker } from './persistence/StoreWorker';
 
 export interface ICacheOpts {
     /** In Seconds */
     maxAge?: number
     monitors?: ICacheChangeEventMonitor[]
     keyResolver?: (...args) => string
-    persistance?: ITransport
+    persistence?: ITransport
     store?: IStore
     doNotWaitSave?: boolean
     trackRef?: boolean
@@ -46,8 +46,8 @@ export class Cache <T = any> {
             this.onChanged = this.onChanged.bind(this);
             options.monitors.forEach(x => x.on('change', this.onChanged));
         }
-        if (this.options.persistance) {
-            this._transport = new TransportWorker(this, this.options.persistance);
+        if (this.options.persistence) {
+            this._transport = new TransportWorker(this, this.options.persistence);
             this.isAsync = this._transport.isAsync;
         }
         if (this.options.store) {

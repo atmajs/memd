@@ -7,8 +7,8 @@ declare module 'memd' {
     import { deco_queued } from 'memd/deco/queued';
     import { fn_clearMemoized, fn_memoize } from 'memd/fn/memoize';
     import { Cache } from 'memd/Cache';
-    import { FsTransport } from 'memd/persistance/FsTransport';
-    import { LocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
+    import { FsTransport } from 'memd/persistence/FsTransport';
+    import { LocalStorageTransport } from 'memd/persistence/LocalStorageTransport';
     import { CachedWorker } from 'memd/workers/CachedWorker';
     import { fn_queued } from 'memd/fn/queued';
     class Memd {
@@ -84,10 +84,12 @@ declare module 'memd/fn/memoize' {
         /** Method to check if cached result, should be removed from cache */
         clearOn?: (val: any) => boolean;
         thisArg?: TThis;
-        /** Override key resolver*/
+        /** Override key resolver */
         key?: (options: {
             this?: TThis;
         }, ...args: Parameters<TMethod>) => string;
+        /** Gets the prefix for a key, for example to distinguish keys per instances */
+        keyPfx?: (self: TThis) => string;
         keyOptions?: {
             deep?: number;
             serialize?: {
@@ -100,14 +102,14 @@ declare module 'memd/fn/memoize' {
 }
 
 declare module 'memd/Cache' {
-    import { ITransport } from 'memd/persistance/ITransport';
-    import { IStore } from "memd/persistance/IStore";
+    import { ITransport } from 'memd/persistence/ITransport';
+    import { IStore } from "memd/persistence/IStore";
     export interface ICacheOpts {
         /** In Seconds */
         maxAge?: number;
         monitors?: ICacheChangeEventMonitor[];
         keyResolver?: (...args: any[]) => string;
-        persistance?: ITransport;
+        persistence?: ITransport;
         store?: IStore;
         doNotWaitSave?: boolean;
         trackRef?: boolean;
@@ -143,8 +145,8 @@ declare module 'memd/Cache' {
     }
 }
 
-declare module 'memd/persistance/FsTransport' {
-    import { ITransport } from 'memd/persistance/ITransport';
+declare module 'memd/persistence/FsTransport' {
+    import { ITransport } from 'memd/persistence/ITransport';
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface IFsTransportOpts {
         path: string;
@@ -161,8 +163,8 @@ declare module 'memd/persistance/FsTransport' {
     }
 }
 
-declare module 'memd/persistance/LocalStorageTransport' {
-    import { ITransport } from 'memd/persistance/ITransport';
+declare module 'memd/persistence/LocalStorageTransport' {
+    import { ITransport } from 'memd/persistence/ITransport';
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface ILocalStorageTransport {
         key: string;
@@ -177,8 +179,8 @@ declare module 'memd/persistance/LocalStorageTransport' {
 }
 
 declare module 'memd/workers/CachedWorker' {
-    import { IFsTransportOpts } from 'memd/persistance/FsTransport';
-    import { ILocalStorageTransport } from 'memd/persistance/LocalStorageTransport';
+    import { IFsTransportOpts } from 'memd/persistence/FsTransport';
+    import { ILocalStorageTransport } from 'memd/persistence/LocalStorageTransport';
     import { ICacheOpts } from 'memd/Cache';
     export interface ICachedWorkerOptions<T> {
         transport: IFsTransportOpts | ILocalStorageTransport;
@@ -215,7 +217,7 @@ declare module 'memd/model/IMemoizeWrapper' {
     }
 }
 
-declare module 'memd/persistance/ITransport' {
+declare module 'memd/persistence/ITransport' {
     import { ICacheEntryCollection } from 'memd/Cache';
     export interface ITransport<T = any> {
         isAsync: boolean;
@@ -227,7 +229,7 @@ declare module 'memd/persistance/ITransport' {
     }
 }
 
-declare module 'memd/persistance/IStore' {
+declare module 'memd/persistence/IStore' {
     import { ICacheEntry } from 'memd/Cache';
     export interface IStore<T = any> {
         get?(key: string, ...args: any[]): ICacheEntry<T>;
