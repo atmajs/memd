@@ -125,6 +125,11 @@
             "atma-loader-ts"
         ],
         "settings": {
+            "atma-io-middleware-condcomments": {
+                "defines": {
+                    "CJS": true
+                }
+            },
             "io": {
                 "extensions": {
                     "ts": [
